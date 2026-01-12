@@ -87,14 +87,15 @@ const RecipeDetail = () => {
 
         try {
             // 1. Find user by email
+            const normalizedEmail = shareEmail.trim().toLowerCase();
             const { data: profiles, error: profileError } = await supabase
                 .from('rb_profiles')
                 .select('id')
-                .eq('email', shareEmail)
+                .eq('email', normalizedEmail)
                 .single();
 
             if (profileError || !profiles) {
-                setShareMessage('User not found. Ensure they are registered with this email.');
+                setShareMessage(`User with email "${normalizedEmail}" not found. Please ensure the email is correct and they are registered.`);
                 return;
             }
 
