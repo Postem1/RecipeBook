@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import logo from '../../assets/logo.png';
 
 const Navbar = () => {
-    const { user, signOut } = useAuth();
+    const { user, isAdmin, signOut } = useAuth();
     const location = useLocation();
     const [isScrolled, setIsScrolled] = useState(false);
 
@@ -70,6 +70,7 @@ const Navbar = () => {
 
                         {user ? (
                             <>
+                                {isAdmin && <Link to="/admin" style={{ ...linkStyle('/admin'), color: 'var(--color-primary)' }}>Admin</Link>}
                                 <Link to="/my-recipes" style={linkStyle('/my-recipes')}>My Recipes</Link>
                                 <Link to="/shared" style={linkStyle('/shared')}>Shared</Link>
                                 <Link to="/favorites" style={linkStyle('/favorites')}>Favorites</Link>

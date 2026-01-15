@@ -8,6 +8,7 @@ import Favorites from './pages/Favorites';
 import RecipeDetail from './pages/RecipeDetail';
 import RecipeForm from './pages/RecipeForm';
 import SharedWithMe from './pages/SharedWithMe';
+import AdminDashboard from './pages/AdminDashboard';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
         <Route path="recipes/:id" element={<RecipeDetail />} />
         <Route path="create-recipe" element={<RecipeForm />} />
         <Route path="edit-recipe/:id" element={<RecipeForm />} />
+        <Route path="admin" element={<AdminDashboard />} />
       </Route>
     </Routes>
   );
