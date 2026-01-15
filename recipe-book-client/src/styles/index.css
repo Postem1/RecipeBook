@@ -1,14 +1,13 @@
 :root {
-  /* Colors */
-  --color-primary: #e67e22; /* Warm Orange */
-  --color-primary-hover: #d35400;
-  --color-secondary: #2ecc71; /* Fresh Green */
-  --color-background: #fdfbf7; /* Warm Neutral/Off-white */
-  --color-surface: #ffffff;
-  --color-text: #2c3e50;
-  --color-text-light: #7f8c8d;
-  --color-border: #ecf0f1;
-  --color-error: #e74c3c;
+  /* Colors - Redesign Palette */
+  --color-primary: #F4D03F;     /* Soft Gold/Yellow */
+  --color-primary-hover: #F1C40F;
+  --color-secondary: #27AE60;   /* Fresh Green */
+  --color-bg-primary: #FFF5E6;  /* Warm Peach/Cream */
+  --color-bg-white: #FFFFFF;    /* Pure White */
+  --color-text-primary: #1A1A1A;/* Deep Navy/Black */
+  --color-text-secondary: #6C757D;
+  --color-border: #E5E7EB;
   
   /* Spacing */
   --spacing-xs: 0.25rem;
@@ -16,16 +15,17 @@
   --spacing-md: 1rem;
   --spacing-lg: 1.5rem;
   --spacing-xl: 2rem;
+  --spacing-xxl: 4rem;
 
   /* Radius */
-  --radius-sm: 0.25rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
 
   /* Shadows */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  --shadow-soft: 0 10px 40px -10px rgba(0,0,0,0.08);
+  --shadow-hover: 0 20px 50px -12px rgba(0,0,0,0.12);
 }
 
 * {
@@ -35,10 +35,10 @@
 }
 
 body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background-color: var(--color-background);
-  color: var(--color-text);
-  line-height: 1.5;
+  font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -52,53 +52,72 @@ button {
 a {
   text-decoration: none;
   color: inherit;
+  transition: color 0.2s;
 }
 
-/* Utilities */
+/* Typography Utilities */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: var(--spacing-sm);
+}
+
+h1 { font-size: 3rem; }
+h2 { font-size: 2.25rem; }
+h3 { font-size: 1.5rem; }
+
+/* Layout Utilities */
 .container {
-  max-width: 1200px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 0 var(--spacing-md);
+  padding: 0 var(--spacing-xl);
 }
 
+/* Button Components */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.5rem 1rem;
-  border-radius: var(--radius-md);
-  font-weight: 500;
-  transition: all 0.2s;
+  padding: 0.75rem 1.5rem;
+  border-radius: 50px; /* Pill shape */
+  font-weight: 600;
+  transition: all 0.3s ease;
   gap: 0.5rem;
+  font-size: 1rem;
 }
 
 .btn-primary {
-  background-color: var(--color-primary);
+  background-color: var(--color-text-primary); /* Dark button for contrast */
   color: white;
 }
 
 .btn-primary:hover {
-  background-color: var(--color-primary-hover);
+  background-color: #000;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
 }
 
 .btn-outline {
-  border: 1px solid var(--color-border);
-  background-color: transparent;
+  border: 2px solid var(--color-text-primary);
+  color: var(--color-text-primary);
+  background: transparent;
 }
 
 .btn-outline:hover {
-  background-color: var(--color-border);
+  background-color: var(--color-text-primary);
+  color: white;
 }
 
+/* Card Component */
 .card {
-  background-color: var(--color-surface);
+  background-color: var(--color-bg-white);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-soft);
   overflow: hidden;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
 }

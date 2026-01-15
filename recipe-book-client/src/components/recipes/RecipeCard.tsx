@@ -1,5 +1,6 @@
 import React from 'react';
-import { Clock, Users } from 'lucide-react'; import { Link } from 'react-router-dom';
+import { Clock, Users } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export interface Recipe {
     id: string;
@@ -21,8 +22,15 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
     const totalTime = (recipe.prep_time || 0) + (recipe.cook_time || 0);
 
     return (
-        <Link to={`/recipes/${recipe.id}`} className="card" style={{ display: 'flex', flexDirection: 'column', height: '100%', textDecoration: 'none', color: 'inherit' }}>
-            <div style={{ position: 'relative', width: '100%', paddingTop: '66%', backgroundColor: '#eee' }}>
+        <Link to={`/recipes/${recipe.id}`} className="card" style={{
+            display: 'flex',
+            flexDirection: 'column',
+            height: '100%',
+            textDecoration: 'none',
+            color: 'inherit',
+            border: '1px solid rgba(0,0,0,0.03)' // Subtle border for definition
+        }}>
+            <div style={{ position: 'relative', width: '100%', paddingTop: '75%', backgroundColor: '#F0F0F0' }}>
                 {recipe.photo_url ? (
                     <img
                         src={recipe.photo_url}
@@ -37,42 +45,82 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
                         }}
                     />
                 ) : (
-                    <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#e0e0e0', color: '#999' }}>
-                        <span style={{ fontSize: '3rem' }}>🍳</span>
+                    <div style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundColor: '#FFF5E6',
+                        color: '#F4D03F'
+                    }}>
+                        <span style={{ fontSize: '4rem' }}>🍳</span>
                     </div>
                 )}
 
                 {recipe.category && (
                     <span style={{
                         position: 'absolute',
-                        top: '0.5rem',
-                        right: '0.5rem',
-                        backgroundColor: 'rgba(255,255,255,0.9)',
-                        padding: '0.25rem 0.5rem',
-                        borderRadius: 'var(--radius-sm)',
+                        top: '1rem',
+                        right: '1rem',
+                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                        padding: '0.4rem 0.8rem',
+                        borderRadius: '20px',
                         fontSize: '0.75rem',
-                        fontWeight: '600',
-                        color: 'var(--color-primary)'
+                        fontWeight: '700',
+                        color: 'var(--color-text-primary)',
+                        letterSpacing: '0.02em',
+                        boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
                     }}>
                         {recipe.category}
                     </span>
                 )}
             </div>
 
-            <div style={{ padding: '1rem', display: 'flex', flexDirection: 'column', flex: 1 }}>
-                <h3 style={{ marginBottom: '0.5rem', fontSize: '1.25rem' }}>{recipe.title}</h3>
-                <p style={{ color: 'var(--color-text-light)', fontSize: '0.875rem', marginBottom: '1rem', flex: 1, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+            <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', flex: 1 }}>
+                <h3 style={{
+                    marginBottom: '0.75rem',
+                    fontSize: '1.4rem',
+                    fontWeight: '800',
+                    lineHeight: '1.3'
+                }}>
+                    {recipe.title}
+                </h3>
+
+                <p style={{
+                    color: 'var(--color-text-secondary)',
+                    fontSize: '0.95rem',
+                    marginBottom: '1.5rem',
+                    flex: 1,
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                    lineHeight: '1.6'
+                }}>
                     {recipe.description}
                 </p>
 
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto', fontSize: '0.875rem', color: 'var(--color-text-light)' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                        <Clock size={16} />
-                        <span>{totalTime > 0 ? `${totalTime}m` : '-'}</span>
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'flex-start',
+                    gap: '1.5rem',
+                    marginTop: 'auto',
+                    fontSize: '0.875rem',
+                    color: 'var(--color-text-primary)',
+                    fontWeight: '600'
+                }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                        <Clock size={18} color="var(--color-primary-hover)" />
+                        <span>{totalTime > 0 ? `${totalTime} min` : '-'}</span>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                        <Users size={16} />
-                        <span>{recipe.servings || '-'}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                        <Users size={18} color="var(--color-primary-hover)" />
+                        <span>{recipe.servings ? `${recipe.servings} servings` : '-'}</span>
                     </div>
                 </div>
             </div>

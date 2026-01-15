@@ -1,34 +1,61 @@
 import { useAuth } from '../../context/AuthContext';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 const Navbar = () => {
     const { user, signOut } = useAuth();
+    const location = useLocation();
+
+    const isActive = (path: string) => location.pathname === path;
+
+    const linkStyle = (path: string) => ({
+        textDecoration: 'none',
+        color: isActive(path) ? 'var(--color-primary-hover)' : 'var(--color-text-primary)',
+        fontWeight: '600',
+        fontSize: '1.1rem',
+        padding: '0.5rem 1rem',
+        transition: 'color 0.2s ease'
+    });
 
     return (
         <nav style={{
-            backgroundColor: 'var(--color-surface)',
-            boxShadow: 'var(--shadow-sm)',
-            padding: '1rem 0'
+            padding: '2rem 0',
+            backgroundColor: 'transparent',
+            marginBottom: '2rem'
         }}>
-            <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Link to="/" style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--color-primary)' }}>
-                    RecipeBook
+            <div className="container" style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+            }}>
+                <Link to="/" style={{
+                    fontSize: '1.8rem',
+                    fontWeight: '800',
+                    color: 'var(--color-text-primary)',
+                    letterSpacing: '-0.02em'
+                }}>
+                    RecipeBook<span style={{ color: 'var(--color-primary)' }}>.</span>
                 </Link>
 
-                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                    <Link to="/" className="btn btn-outline">Discover</Link>
+                <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
+                    <Link to="/" style={linkStyle('/')}>Discover</Link>
 
                     {user ? (
                         <>
-                            <Link to="/my-recipes" className="btn btn-outline">My Recipes</Link>
-                            <Link to="/shared" className="btn btn-outline">Shared with Me</Link>
-                            <Link to="/favorites" className="btn btn-outline">Favorites</Link>
-                            <button onClick={() => signOut()} className="btn btn-outline">Sign Out</button>
+                            <Link to="/my-recipes" style={linkStyle('/my-recipes')}>My Recipes</Link>
+                            <Link to="/shared" style={linkStyle('/shared')}>Shared</Link>
+                            <Link to="/favorites" style={linkStyle('/favorites')}>Favorites</Link>
+                            <button
+                                onClick={() => signOut()}
+                                className="btn btn-primary"
+                                style={{ marginLeft: '1rem' }}
+                            >
+                                Sign Out
+                            </button>
                         </>
                     ) : (
                         <>
-                            <Link to="/login" className="btn btn-primary">Login</Link>
-                            <Link to="/register" className="btn btn-outline">Sign Up</Link>
+                            <Link to="/login" style={linkStyle('/login')}>Login</Link>
+                            <Link to="/register" className="btn btn-primary">Sign Up</Link>
                         </>
                     )}
                 </div>
