@@ -1,6 +1,7 @@
 import { useAuth } from '../../context/AuthContext';
 import { Link, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import logo from '../../assets/logo.png';
 
 const Navbar = () => {
     const { user, signOut } = useAuth();
@@ -47,13 +48,21 @@ const Navbar = () => {
                     alignItems: 'center'
                 }}>
                     <Link to="/" style={{
+                        display: 'flex',
+                        alignItems: 'center',
                         fontSize: '1.8rem',
                         fontWeight: '800',
                         color: 'var(--color-text-primary)',
                         letterSpacing: '-0.02em',
-                        textDecoration: 'none'
+                        textDecoration: 'none',
+                        gap: '0.75rem'
                     }}>
-                        RecipeBook<span style={{ color: 'var(--color-primary)' }}>.</span>
+                        <img src={logo} alt="RecipeBook Logo" style={{
+                            height: '40px',
+                            width: 'auto',
+                            objectFit: 'contain'
+                        }} />
+                        <span>RecipeBook<span style={{ color: 'var(--color-primary)' }}>.</span></span>
                     </Link>
 
                     <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
