@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { Users, BookOpen, Trash2, Edit, Search, BarChart3, LayoutDashboard } from 'lucide-react';
+import * as AlertDialog from '@radix-ui/react-alert-dialog';
 
 // Types
 interface Profile {
@@ -70,9 +71,7 @@ const AdminDashboard = () => {
     };
 
     const handleDeleteUser = async (userId: string, email: string) => {
-        if (!window.confirm(`DANGER: Are you sure you want to delete user "${email}"?\n\nThis will PERMANENTLY DELETE current user, ALL their recipes, comments, and data.\nThis action cannot be undone.`)) {
-            return;
-        }
+        // Confirmation handled by AlertDialog
 
         try {
             // Call the RPC function we created
@@ -91,13 +90,13 @@ const AdminDashboard = () => {
     };
 
     const handleDeleteRecipe = async (recipeId: string) => {
-        if (!window.confirm('Delete this recipe?')) return;
+        // Confirmation handled by AlertDialog
 
         const { error } = await supabase.from('rb_recipes').delete().eq('id', recipeId);
 
         if (error) {
             console.error('Error deleting recipe:', error);
-            alert('Failed to delete recipe');
+            alert(`Failed to delete recipe: ${error.message} (Code: ${error.code})`);
         } else {
             setRecipes(recipes.filter(r => r.id !== recipeId));
         }
@@ -241,13 +240,53 @@ const AdminDashboard = () => {
                                         <td style={{ padding: '1rem', color: '#999', fontSize: '0.85rem' }}>{profile.id.slice(0, 8)}...</td>
                                         <td style={{ padding: '1rem', textAlign: 'right' }}>
                                             {profile.id !== user?.id && (
-                                                <button
-                                                    onClick={() => handleDeleteUser(profile.id, profile.email)}
-                                                    className="btn"
-                                                    style={{ backgroundColor: '#FFEBEE', color: '#D32F2F', padding: '0.5rem 1rem', fontSize: '0.85rem' }}
-                                                >
-                                                    <Trash2 size={16} style={{ marginRight: '0.5rem' }} /> Delete
-                                                </button>
+                                                <AlertDialog.Root>
+                                                    <AlertDialog.Trigger asChild>
+                                                        <button
+                                                            className="btn"
+                                                            style={{ backgroundColor: '#FFEBEE', color: '#D32F2F', padding: '0.5rem 1rem', fontSize: '0.85rem' }}
+                                                        >
+                                                            <Trash2 size={16} style={{ marginRight: '0.5rem' }} /> Delete
+                                                        </button>
+                                                    </AlertDialog.Trigger>
+                                                    <AlertDialog.Portal>
+                                                        <AlertDialog.Overlay style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 100 }} />
+                                                        <AlertDialog.Content style={{
+                                                            position: 'fixed',
+                                                            top: '50%',
+                                                            left: '50%',
+                                                            transform: 'translate(-50%, -50%)',
+                                                            backgroundColor: 'white',
+                                                            padding: '2rem',
+                                                            borderRadius: 'var(--radius-md)',
+                                                            boxShadow: 'var(--shadow-lg)',
+                                                            maxWidth: '500px',
+                                                            width: '90%',
+                                                            zIndex: 101
+                                                        }}>
+                                                            <AlertDialog.Title style={{ marginBottom: '1rem', fontSize: '1.25rem', fontWeight: 'bold' }}>Delete User "{profile.email}"?</AlertDialog.Title>
+                                                            <AlertDialog.Description style={{ marginBottom: '1.5rem', color: 'var(--color-text-light)', lineHeight: '1.6' }}>
+                                                                <strong style={{ color: 'var(--color-error)' }}>DANGER ZONE</strong><br />
+                                                                This will <strong>PERMANENTLY DELETE</strong> this user, all their recipes, comments, and associated data.<br />
+                                                                This action cannot be undone.
+                                                            </AlertDialog.Description>
+                                                            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+                                                                <AlertDialog.Cancel asChild>
+                                                                    <button className="btn btn-outline">Cancel</button>
+                                                                </AlertDialog.Cancel>
+                                                                <AlertDialog.Action asChild>
+                                                                    <button
+                                                                        onClick={() => handleDeleteUser(profile.id, profile.email)}
+                                                                        className="btn btn-primary"
+                                                                        style={{ backgroundColor: 'var(--color-error)', borderColor: 'var(--color-error)' }}
+                                                                    >
+                                                                        Yes, Permanently Delete
+                                                                    </button>
+                                                                </AlertDialog.Action>
+                                                            </div>
+                                                        </AlertDialog.Content>
+                                                    </AlertDialog.Portal>
+                                                </AlertDialog.Root>
                                             )}
                                         </td>
                                     </tr>
@@ -309,13 +348,52 @@ const AdminDashboard = () => {
                                             <Link to={`/edit-recipe/${recipe.id}`} className="btn" style={{ padding: '0.5rem', backgroundColor: '#F5F5F5' }}>
                                                 <Edit size={16} />
                                             </Link>
-                                            <button
-                                                onClick={() => handleDeleteRecipe(recipe.id)}
-                                                className="btn"
-                                                style={{ padding: '0.5rem', backgroundColor: '#FFEBEE', color: '#D32F2F' }}
-                                            >
-                                                <Trash2 size={16} />
-                                            </button>
+                                            <AlertDialog.Root>
+                                                <AlertDialog.Trigger asChild>
+                                                    <button
+                                                        className="btn"
+                                                        style={{ padding: '0.5rem', backgroundColor: '#FFEBEE', color: '#D32F2F' }}
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </button>
+                                                </AlertDialog.Trigger>
+                                                <AlertDialog.Portal>
+                                                    <AlertDialog.Overlay style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 100 }} />
+                                                    <AlertDialog.Content style={{
+                                                        position: 'fixed',
+                                                        top: '50%',
+                                                        left: '50%',
+                                                        transform: 'translate(-50%, -50%)',
+                                                        backgroundColor: 'white',
+                                                        padding: '2rem',
+                                                        borderRadius: 'var(--radius-md)',
+                                                        boxShadow: 'var(--shadow-lg)',
+                                                        maxWidth: '400px',
+                                                        width: '90%',
+                                                        zIndex: 101
+                                                    }}>
+                                                        <AlertDialog.Title style={{ marginBottom: '1rem', fontSize: '1.25rem', fontWeight: 'bold' }}>Delete Recipe?</AlertDialog.Title>
+                                                        <AlertDialog.Description style={{ marginBottom: '1.5rem', color: 'var(--color-text-light)' }}>
+                                                            Are you sure you want to delete <strong>"{recipe.title}"</strong>?<br />
+                                                            This action cannot be undone.
+                                                        </AlertDialog.Description>
+                                                        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+                                                            <AlertDialog.Cancel asChild>
+                                                                <button className="btn btn-outline">Cancel</button>
+                                                            </AlertDialog.Cancel>
+                                                            <AlertDialog.Action asChild>
+                                                                <button
+                                                                    onClick={() => handleDeleteRecipe(recipe.id)}
+                                                                    className="btn btn-primary"
+                                                                    style={{ backgroundColor: 'var(--color-error)', borderColor: 'var(--color-error)' }}
+                                                                >
+                                                                    Yes, Delete
+                                                                </button>
+                                                            </AlertDialog.Action>
+                                                        </div>
+                                                    </AlertDialog.Content>
+                                                </AlertDialog.Portal>
+                                            </AlertDialog.Root>
                                         </td>
                                     </tr>
                                 ))}

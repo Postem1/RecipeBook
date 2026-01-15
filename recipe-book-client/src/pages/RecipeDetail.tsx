@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { Clock, Users, Heart, Trash2, Edit, Share2, Lock, Unlock } from 'lucide-react';
 import CommentSection from '../components/comments/CommentSection';
 import * as Dialog from '@radix-ui/react-dialog';
+import * as AlertDialog from '@radix-ui/react-alert-dialog';
 
 const RecipeDetail = () => {
     const { id } = useParams<{ id: string }>();
@@ -124,7 +125,7 @@ const RecipeDetail = () => {
     };
 
     const handleDelete = async () => {
-        if (!window.confirm('Are you sure you want to delete this recipe?')) return;
+        // Confirmation is handled by AlertDialog now
 
         const { error } = await supabase.from('rb_recipes').delete().eq('id', id);
         if (error) {
@@ -242,7 +243,49 @@ const RecipeDetail = () => {
                                 {canModify && (
                                     <>
                                         <Link to={`/edit-recipe/${recipe.id}`} className="btn btn-outline"><Edit size={20} /></Link>
-                                        <button onClick={handleDelete} className="btn btn-outline" style={{ color: 'var(--color-error)' }}><Trash2 size={20} /></button>
+
+                                        <AlertDialog.Root>
+                                            <AlertDialog.Trigger asChild>
+                                                <button className="btn btn-outline" style={{ color: 'var(--color-error)' }} title="Delete Recipe">
+                                                    <Trash2 size={20} />
+                                                </button>
+                                            </AlertDialog.Trigger>
+                                            <AlertDialog.Portal>
+                                                <AlertDialog.Overlay style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 100 }} />
+                                                <AlertDialog.Content style={{
+                                                    position: 'fixed',
+                                                    top: '50%',
+                                                    left: '50%',
+                                                    transform: 'translate(-50%, -50%)',
+                                                    backgroundColor: 'white',
+                                                    padding: '2rem',
+                                                    borderRadius: 'var(--radius-md)',
+                                                    boxShadow: 'var(--shadow-lg)',
+                                                    maxWidth: '400px',
+                                                    width: '90%',
+                                                    zIndex: 101
+                                                }}>
+                                                    <AlertDialog.Title style={{ marginBottom: '1rem', fontSize: '1.25rem', fontWeight: 'bold' }}>Delete Recipe?</AlertDialog.Title>
+                                                    <AlertDialog.Description style={{ marginBottom: '1.5rem', color: 'var(--color-text-light)' }}>
+                                                        Are you sure you want to delete this recipe? This action cannot be undone.
+                                                    </AlertDialog.Description>
+                                                    <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+                                                        <AlertDialog.Cancel asChild>
+                                                            <button className="btn btn-outline">Cancel</button>
+                                                        </AlertDialog.Cancel>
+                                                        <AlertDialog.Action asChild>
+                                                            <button
+                                                                onClick={handleDelete}
+                                                                className="btn btn-primary"
+                                                                style={{ backgroundColor: 'var(--color-error)', borderColor: 'var(--color-error)' }}
+                                                            >
+                                                                Yes, Delete
+                                                            </button>
+                                                        </AlertDialog.Action>
+                                                    </div>
+                                                </AlertDialog.Content>
+                                            </AlertDialog.Portal>
+                                        </AlertDialog.Root>
                                     </>
                                 )}
                             </div>
