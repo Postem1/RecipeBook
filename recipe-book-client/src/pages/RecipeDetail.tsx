@@ -127,7 +127,11 @@ const RecipeDetail = () => {
         if (!window.confirm('Are you sure you want to delete this recipe?')) return;
 
         const { error } = await supabase.from('rb_recipes').delete().eq('id', id);
-        if (!error) {
+        if (error) {
+            // Debugging: Alert the user if deletion fails
+            console.error('Error deleting recipe:', error);
+            alert(`Error deleting recipe: ${error.message} (Code: ${error.code})`);
+        } else {
             navigate('/');
         }
     };
