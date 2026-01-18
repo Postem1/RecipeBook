@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
-import { Users, BookOpen, Trash2, Edit, Search, BarChart3, LayoutDashboard, UserCheck } from 'lucide-react';
+import { Users, BookOpen, Trash2, Edit, Search, BarChart3, LayoutDashboard, UserCheck, Shield, ShieldOff } from 'lucide-react';
 import * as AlertDialog from '@radix-ui/react-alert-dialog';
 import UserSelector from '../components/admin/UserSelector';
 
@@ -38,6 +38,7 @@ const AdminDashboard = () => {
     // Reassignment State
     const [assignRecipeId, setAssignRecipeId] = useState<string | null>(null);
     const [showUserSelector, setShowUserSelector] = useState(false);
+    const [roleChangeTarget, setRoleChangeTarget] = useState<{ id: string, email: string, currentRole: string } | null>(null);
 
     useEffect(() => {
         if (!authLoading && !isAdmin) {
@@ -138,11 +139,36 @@ const AdminDashboard = () => {
         } else {
             // Update local state
             setRecipes(recipes.map(r => r.id === assignRecipeId ? { ...r, user_id: newUserId } : r));
-            // alert('Recipe owner reassigned successfully.'); // Optional feedback
         }
 
         setShowUserSelector(false);
         setAssignRecipeId(null);
+    };
+
+    const handleToggleRole = (profile: Profile) => {
+        setRoleChangeTarget({ id: profile.id, email: profile.email, currentRole: profile.role || 'user' });
+    };
+
+    const confirmRoleChange = async () => {
+        if (!roleChangeTarget) return;
+        const userId = roleChangeTarget.id;
+        const currentRole = roleChangeTarget.currentRole;
+        const newRole = currentRole === 'admin' ? 'user' : 'admin';
+        const action = newRole === 'admin' ? 'Promote' : 'Demote';
+
+        const { error } = await supabase
+            .from('rb_profiles')
+            .update({ role: newRole })
+            .eq('id', userId);
+
+        if (error) {
+            console.error('Error updating role:', error);
+            alert(`Failed to ${action.toLowerCase()} user.`);
+        } else {
+            // Update local state
+            setProfiles(profiles.map(p => p.id === userId ? { ...p, role: newRole } : p));
+        }
+        setRoleChangeTarget(null);
     };
 
     // Derived Stats
@@ -272,55 +298,71 @@ const AdminDashboard = () => {
                                             </span>
                                         </td>
                                         <td style={{ padding: '1rem', color: '#999', fontSize: '0.85rem' }}>{profile.id.slice(0, 8)}...</td>
-                                        <td style={{ padding: '1rem', textAlign: 'right' }}>
+                                        <td style={{ padding: '1rem', textAlign: 'right', display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
                                             {profile.id !== user?.id && (
-                                                <AlertDialog.Root>
-                                                    <AlertDialog.Trigger asChild>
-                                                        <button
-                                                            className="btn"
-                                                            style={{ backgroundColor: '#FFEBEE', color: '#D32F2F', padding: '0.5rem 1rem', fontSize: '0.85rem' }}
-                                                        >
-                                                            <Trash2 size={16} style={{ marginRight: '0.5rem' }} /> Delete
-                                                        </button>
-                                                    </AlertDialog.Trigger>
-                                                    <AlertDialog.Portal>
-                                                        <AlertDialog.Overlay style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 100 }} />
-                                                        <AlertDialog.Content style={{
-                                                            position: 'fixed',
-                                                            top: '50%',
-                                                            left: '50%',
-                                                            transform: 'translate(-50%, -50%)',
-                                                            backgroundColor: 'white',
-                                                            padding: '2rem',
-                                                            borderRadius: 'var(--radius-md)',
-                                                            boxShadow: 'var(--shadow-lg)',
-                                                            maxWidth: '500px',
-                                                            width: '90%',
-                                                            zIndex: 101
-                                                        }}>
-                                                            <AlertDialog.Title style={{ marginBottom: '1rem', fontSize: '1.25rem', fontWeight: 'bold' }}>Delete User "{profile.email}"?</AlertDialog.Title>
-                                                            <AlertDialog.Description style={{ marginBottom: '1.5rem', color: 'var(--color-text-light)', lineHeight: '1.6' }}>
-                                                                <strong style={{ color: 'var(--color-error)' }}>DANGER ZONE</strong><br />
-                                                                This will <strong>PERMANENTLY DELETE</strong> this user, all their recipes, comments, and associated data.<br />
-                                                                This action cannot be undone.
-                                                            </AlertDialog.Description>
-                                                            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-                                                                <AlertDialog.Cancel asChild>
-                                                                    <button className="btn btn-outline">Cancel</button>
-                                                                </AlertDialog.Cancel>
-                                                                <AlertDialog.Action asChild>
-                                                                    <button
-                                                                        onClick={() => handleDeleteUser(profile.id, profile.email)}
-                                                                        className="btn btn-primary"
-                                                                        style={{ backgroundColor: 'var(--color-error)', borderColor: 'var(--color-error)' }}
-                                                                    >
-                                                                        Yes, Permanently Delete
-                                                                    </button>
-                                                                </AlertDialog.Action>
-                                                            </div>
-                                                        </AlertDialog.Content>
-                                                    </AlertDialog.Portal>
-                                                </AlertDialog.Root>
+                                                <>
+                                                    <button
+                                                        onClick={() => handleToggleRole(profile)}
+                                                        className="btn"
+                                                        style={{
+                                                            backgroundColor: profile.role === 'admin' ? '#FFF3E0' : '#E8F5E9',
+                                                            color: profile.role === 'admin' ? '#FF9800' : '#4CAF50',
+                                                            padding: '0.5rem',
+                                                            marginRight: '0.5rem'
+                                                        }}
+                                                        title={profile.role === 'admin' ? "Demote to User" : "Promote to Admin"}
+                                                    >
+                                                        {profile.role === 'admin' ? <ShieldOff size={16} /> : <Shield size={16} />}
+                                                    </button>
+
+                                                    <AlertDialog.Root>
+                                                        <AlertDialog.Trigger asChild>
+                                                            <button
+                                                                className="btn"
+                                                                style={{ backgroundColor: '#FFEBEE', color: '#D32F2F', padding: '0.5rem 1rem', fontSize: '0.85rem' }}
+                                                            >
+                                                                <Trash2 size={16} style={{ marginRight: '0.5rem' }} /> Delete
+                                                            </button>
+                                                        </AlertDialog.Trigger>
+                                                        <AlertDialog.Portal>
+                                                            <AlertDialog.Overlay style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 100 }} />
+                                                            <AlertDialog.Content style={{
+                                                                position: 'fixed',
+                                                                top: '50%',
+                                                                left: '50%',
+                                                                transform: 'translate(-50%, -50%)',
+                                                                backgroundColor: 'white',
+                                                                padding: '2rem',
+                                                                borderRadius: 'var(--radius-md)',
+                                                                boxShadow: 'var(--shadow-lg)',
+                                                                maxWidth: '500px',
+                                                                width: '90%',
+                                                                zIndex: 101
+                                                            }}>
+                                                                <AlertDialog.Title style={{ marginBottom: '1rem', fontSize: '1.25rem', fontWeight: 'bold' }}>Delete User "{profile.email}"?</AlertDialog.Title>
+                                                                <AlertDialog.Description style={{ marginBottom: '1.5rem', color: 'var(--color-text-light)', lineHeight: '1.6' }}>
+                                                                    <strong style={{ color: 'var(--color-error)' }}>DANGER ZONE</strong><br />
+                                                                    This will <strong>PERMANENTLY DELETE</strong> this user, all their recipes, comments, and associated data.<br />
+                                                                    This action cannot be undone.
+                                                                </AlertDialog.Description>
+                                                                <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+                                                                    <AlertDialog.Cancel asChild>
+                                                                        <button className="btn btn-outline">Cancel</button>
+                                                                    </AlertDialog.Cancel>
+                                                                    <AlertDialog.Action asChild>
+                                                                        <button
+                                                                            onClick={() => handleDeleteUser(profile.id, profile.email)}
+                                                                            className="btn btn-primary"
+                                                                            style={{ backgroundColor: 'var(--color-error)', borderColor: 'var(--color-error)' }}
+                                                                        >
+                                                                            Yes, Permanently Delete
+                                                                        </button>
+                                                                    </AlertDialog.Action>
+                                                                </div>
+                                                            </AlertDialog.Content>
+                                                        </AlertDialog.Portal>
+                                                    </AlertDialog.Root>
+                                                </>
                                             )}
                                         </td>
                                     </tr>
@@ -451,6 +493,53 @@ const AdminDashboard = () => {
                 onSelect={handleReassignOwner}
                 title="Reassign Recipe Owner"
             />
+            {/* Role Change Confirmation Modal */}
+            <AlertDialog.Root open={!!roleChangeTarget} onOpenChange={(open) => !open && setRoleChangeTarget(null)}>
+                <AlertDialog.Portal>
+                    <AlertDialog.Overlay style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 100 }} />
+                    <AlertDialog.Content style={{
+                        position: 'fixed',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        backgroundColor: 'white',
+                        padding: '2rem',
+                        borderRadius: 'var(--radius-md)',
+                        boxShadow: 'var(--shadow-lg)',
+                        maxWidth: '500px',
+                        width: '90%',
+                        zIndex: 101
+                    }}>
+                        <AlertDialog.Title style={{ marginBottom: '1rem', fontSize: '1.25rem', fontWeight: 'bold' }}>
+                            {roleChangeTarget?.currentRole === 'admin' ? 'Demote to User?' : 'Promote to Admin?'}
+                        </AlertDialog.Title>
+                        <AlertDialog.Description style={{ marginBottom: '1.5rem', color: 'var(--color-text-light)', lineHeight: '1.6' }}>
+                            Are you sure you want to change the role of <strong>{roleChangeTarget?.email}</strong> to <strong>{roleChangeTarget?.currentRole === 'admin' ? 'User' : 'Admin'}</strong>?
+                            {roleChangeTarget?.currentRole !== 'admin' && (
+                                <><br /><br /><strong>Note:</strong> Admins have full access to manage users and recipes.</>
+                            )}
+                        </AlertDialog.Description>
+                        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+                            <AlertDialog.Cancel asChild>
+                                <button className="btn btn-outline" onClick={() => setRoleChangeTarget(null)}>Cancel</button>
+                            </AlertDialog.Cancel>
+                            <AlertDialog.Action asChild>
+                                <button
+                                    onClick={confirmRoleChange}
+                                    className="btn btn-primary"
+                                    style={{
+                                        backgroundColor: roleChangeTarget?.currentRole === 'admin' ? '#FF9800' : '#4CAF50',
+                                        borderColor: roleChangeTarget?.currentRole === 'admin' ? '#FF9800' : '#4CAF50'
+                                    }}
+                                >
+                                    Yes, {roleChangeTarget?.currentRole === 'admin' ? 'Demote' : 'Promote'}
+                                </button>
+                            </AlertDialog.Action>
+                        </div>
+                    </AlertDialog.Content>
+                </AlertDialog.Portal>
+            </AlertDialog.Root>
+
         </div>
     );
 };
