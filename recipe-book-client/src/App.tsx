@@ -9,6 +9,7 @@ import RecipeDetail from './pages/RecipeDetail';
 import RecipeForm from './pages/RecipeForm';
 import SharedWithMe from './pages/SharedWithMe';
 import AdminDashboard from './pages/AdminDashboard';
+import Profile from './pages/Profile';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route path="create-recipe" element={<RecipeForm />} />
         <Route path="edit-recipe/:id" element={<RecipeForm />} />
         <Route path="admin" element={<AdminDashboard />} />
+        <Route path="profile" element={<Profile />} />
       </Route>
     </Routes>
   );

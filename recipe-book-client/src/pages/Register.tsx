@@ -5,6 +5,7 @@ import { useNavigate, Link } from 'react-router-dom';
 const Register = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [username, setUsername] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
@@ -15,9 +16,35 @@ const Register = () => {
         setLoading(true);
         setError(null);
 
+        // Validation
+        const usernameRegex = /^[a-zA-Z0-9]{1,18}$/;
+        if (!usernameRegex.test(username)) {
+            setError('Username must be alphanumeric and max 18 characters.');
+            setLoading(false);
+            return;
+        }
+
+        // Check username uniqueness
+        const { data: existingUser } = await supabase
+            .from('rb_profiles')
+            .select('username')
+            .ilike('username', username)
+            .single();
+
+        if (existingUser) {
+            setError('Username already taken.');
+            setLoading(false);
+            return;
+        }
+
         const { error } = await supabase.auth.signUp({
             email,
             password,
+            options: {
+                data: {
+                    username,
+                },
+            },
         });
 
         if (error) {
@@ -47,6 +74,24 @@ const Register = () => {
                 )}
 
                 <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    <div>
+                        <label htmlFor="username" style={{ display: 'block', marginBottom: '0.5rem' }}>Username</label>
+                        <input
+                            id="username"
+                            type="text"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            required
+                            placeholder="Alphanumeric, max 18 chars"
+                            style={{
+                                width: '100%',
+                                padding: '0.75rem',
+                                borderRadius: 'var(--radius-md)',
+                                border: '1px solid var(--color-border)'
+                            }}
+                        />
+                    </div>
+
                     <div>
                         <label htmlFor="email" style={{ display: 'block', marginBottom: '0.5rem' }}>Email</label>
                         <input

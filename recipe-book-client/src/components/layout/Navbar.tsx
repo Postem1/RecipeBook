@@ -2,9 +2,10 @@ import { useAuth } from '../../context/AuthContext';
 import { Link, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import logo from '../../assets/logo.png';
+import UserAvatar from '../common/UserAvatar';
 
 const Navbar = () => {
-    const { user, isAdmin, signOut } = useAuth();
+    const { user, profile, isAdmin } = useAuth();
     const location = useLocation();
     const [isScrolled, setIsScrolled] = useState(false);
 
@@ -74,13 +75,13 @@ const Navbar = () => {
                                 <Link to="/my-recipes" style={linkStyle('/my-recipes')}>My Recipes</Link>
                                 <Link to="/shared" style={linkStyle('/shared')}>Shared</Link>
                                 <Link to="/favorites" style={linkStyle('/favorites')}>Favorites</Link>
-                                <button
-                                    onClick={() => signOut()}
-                                    className="btn btn-primary"
-                                    style={{ marginLeft: '1rem' }}
-                                >
-                                    Sign Out
-                                </button>
+                                <Link to="/profile" style={{ textDecoration: 'none', marginLeft: '1rem' }}>
+                                    <UserAvatar
+                                        avatarUrl={profile?.avatar_url}
+                                        username={profile?.username || user.email}
+                                        size="40px"
+                                    />
+                                </Link>
                             </>
                         ) : (
                             <>
