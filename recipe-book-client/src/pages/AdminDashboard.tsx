@@ -9,6 +9,7 @@ import * as AlertDialog from '@radix-ui/react-alert-dialog';
 interface Profile {
     id: string;
     email: string;
+    username: string | null;
     role: string;
     created_at?: string;
 }
@@ -216,6 +217,7 @@ const AdminDashboard = () => {
                             <thead>
                                 <tr style={{ borderBottom: '2px solid var(--color-border)' }}>
                                     <th style={{ textAlign: 'left', padding: '1rem' }}>Email</th>
+                                    <th style={{ textAlign: 'left', padding: '1rem' }}>Username</th>
                                     <th style={{ textAlign: 'left', padding: '1rem' }}>Role</th>
                                     <th style={{ textAlign: 'left', padding: '1rem' }}>ID</th>
                                     <th style={{ textAlign: 'right', padding: '1rem' }}>Actions</th>
@@ -225,6 +227,7 @@ const AdminDashboard = () => {
                                 {filteredUsers.map(profile => (
                                     <tr key={profile.id} style={{ borderBottom: '1px solid var(--color-border)' }}>
                                         <td style={{ padding: '1rem', fontWeight: '500' }}>{profile.email}</td>
+                                        <td style={{ padding: '1rem' }}>{profile.username || '-'}</td>
                                         <td style={{ padding: '1rem' }}>
                                             <span style={{
                                                 padding: '0.25rem 0.75rem',
