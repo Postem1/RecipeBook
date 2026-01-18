@@ -12,6 +12,9 @@ export interface Recipe {
     servings: number | null;
     category: string | null;
     is_private?: boolean;
+    rb_profiles?: {
+        username: string | null;
+    };
 }
 
 interface RecipeCardProps {
@@ -76,6 +79,24 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
                         boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
                     }}>
                         {recipe.category}
+                    </span>
+                )}
+
+                {recipe.rb_profiles?.username && (
+                    <span style={{
+                        position: 'absolute',
+                        bottom: '0.5rem',
+                        right: '1rem',
+                        color: 'white',
+                        fontSize: '0.875rem',
+                        fontWeight: '600',
+                        textShadow: '0 2px 4px rgba(0,0,0,0.6)',
+                        zIndex: 2,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.3rem'
+                    }}>
+                        @{recipe.rb_profiles.username}
                     </span>
                 )}
             </div>

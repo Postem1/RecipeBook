@@ -18,7 +18,10 @@ const Favorites = () => {
                 .from('rb_favorites')
                 .select(`
           recipe_id,
-          rb_recipes (*)
+          rb_recipes (
+            *,
+            rb_profiles (username)
+          )
         `)
                 .eq('user_id', user!.id);
 

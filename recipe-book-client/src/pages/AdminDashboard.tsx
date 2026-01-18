@@ -330,7 +330,7 @@ const AdminDashboard = () => {
                                 {filteredRecipes.map(recipe => (
                                     <tr key={recipe.id} style={{ borderBottom: '1px solid var(--color-border)' }}>
                                         <td style={{ padding: '1rem', fontWeight: '500' }}>
-                                            <Link to={`/recipe/${recipe.id}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                                            <Link to={`/edit-recipe/${recipe.id}`} style={{ color: 'inherit', textDecoration: 'none' }}>
                                                 {recipe.title}
                                             </Link>
                                         </td>

@@ -12,7 +12,7 @@ const RecipeDetail = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const { user, isAdmin } = useAuth();
-    const [recipe, setRecipe] = useState<Recipe & { ingredients: any, instructions: string, user_id: string } | null>(null);
+    const [recipe, setRecipe] = useState<Recipe & { ingredients: any, instructions: string, user_id: string, rb_profiles: { username: string | null } } | null>(null);
     const [loading, setLoading] = useState(true);
     const [isFavorite, setIsFavorite] = useState(false);
     const [shareEmail, setShareEmail] = useState('');
@@ -30,7 +30,7 @@ const RecipeDetail = () => {
         try {
             const { data, error } = await supabase
                 .from('rb_recipes')
-                .select('*')
+                .select('*, rb_profiles(username)')
                 .eq('id', id)
                 .single();
 
@@ -172,6 +172,18 @@ const RecipeDetail = () => {
                                 <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Users /> {recipe.servings} servings</span>
                             </div>
                         </div>
+                        {recipe.rb_profiles?.username && (
+                            <div style={{
+                                fontSize: '1.2rem',
+                                fontWeight: '600',
+                                textShadow: '0 2px 4px rgba(0,0,0,0.6)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.5rem'
+                            }}>
+                                @{recipe.rb_profiles.username}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

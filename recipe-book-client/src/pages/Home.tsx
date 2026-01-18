@@ -20,7 +20,7 @@ const Home = () => {
             setLoading(true);
             const { data, error } = await supabase
                 .from('rb_recipes')
-                .select('*')
+                .select('*, rb_profiles(username)')
                 .eq('is_private', false)
                 .order('created_at', { ascending: false });
 
