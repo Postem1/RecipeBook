@@ -10,6 +10,7 @@ import RecipeForm from './pages/RecipeForm';
 import SharedWithMe from './pages/SharedWithMe';
 import AdminDashboard from './pages/AdminDashboard';
 import Profile from './pages/Profile';
+import ProtectedRoute from './components/auth/ProtectedRoute';
 
 function App() {
   return (
@@ -22,8 +23,10 @@ function App() {
         <Route path="favorites" element={<Favorites />} />
         <Route path="shared" element={<SharedWithMe />} />
         <Route path="recipes/:id" element={<RecipeDetail />} />
-        <Route path="create-recipe" element={<RecipeForm />} />
-        <Route path="edit-recipe/:id" element={<RecipeForm />} />
+        <Route element={<ProtectedRoute />}>
+          <Route path="create-recipe" element={<RecipeForm />} />
+          <Route path="edit-recipe/:id" element={<RecipeForm />} />
+        </Route>
         <Route path="admin" element={<AdminDashboard />} />
         <Route path="profile" element={<Profile />} />
       </Route>
