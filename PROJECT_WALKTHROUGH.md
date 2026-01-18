@@ -61,6 +61,22 @@ You can share your private recipes with friends who are also on the platform.
 ### Favorites
 -   Click the **Heart** icon on any recipe to save it to your Favorites list for quick access later.
 
+    -   Click the **Heart** icon on any recipe to save it to your Favorites list for quick access later.
+    
+## Admin Capabilities (Superuser)
+
+If you have been granted `admin` privileges, you will see an **Admin** link in the navigation bar.
+
+### User Management
+1.  Navigate to the **Admin Dashboard**.
+2.  Switch to the **Users** tab.
+3.  **Promote/Demote**: Use the Shield icon buttons to toggle a user's role between `user` and `admin`. A confirmation dialog will appear to prevent accidental changes.
+
+### Recipe Oversight
+1.  Navigate to the **Admin Dashboard** (Overview tab).
+2.  **Reassign Ownership**: In the "Recent Recipes" table, click the **User Check** icon next to a recipe.
+3.  Select a new owner from the dropdown list to transfer the recipe (useful for organizing imported recipes).
+
 ## Troubleshooting
 
 -   **Search not working?** Ensure you are spelling user emails correctly (though capitalization doesn't matter).

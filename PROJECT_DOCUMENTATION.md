@@ -34,6 +34,10 @@ The client application (`recipe-book-client`) provides a rich user interface for
 -   **Discovery**:
     -   Search capabilities.
     -   Category filtering (Breakfast, Lunch, Dinner, etc.).
+-   **Admin Dashboard** (Superuser Only):
+    -   **System Stats**: View key metrics (Total Users, Recipes, Sessions).
+    -   **User Management**: Promote users to Admins or demote them using a secure confirmation dialog.
+    -   **Recipe Oversight**: Monitor all recipes and reassign ownership if necessary (e.g., for imported content).
 
 ### Directory Structure (`recipe-book-client/src`)
 -   `components/`: Reusable UI components (RecipeCard, Navbar, specialized forms).
