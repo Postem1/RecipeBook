@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
-import { Users, BookOpen, Trash2, Edit, Search, BarChart3, LayoutDashboard } from 'lucide-react';
+import { Users, BookOpen, Trash2, Edit, Search, BarChart3, LayoutDashboard, UserCheck } from 'lucide-react';
 import * as AlertDialog from '@radix-ui/react-alert-dialog';
+import UserSelector from '../components/admin/UserSelector';
 
 // Types
 interface Profile {
@@ -33,6 +34,10 @@ const AdminDashboard = () => {
     const [recipes, setRecipes] = useState<Recipe[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+
+    // Reassignment State
+    const [assignRecipeId, setAssignRecipeId] = useState<string | null>(null);
+    const [showUserSelector, setShowUserSelector] = useState(false);
 
     useEffect(() => {
         if (!authLoading && !isAdmin) {
@@ -112,6 +117,32 @@ const AdminDashboard = () => {
         if (!error) {
             setRecipes(recipes.map(r => r.id === recipeId ? { ...r, is_private: !currentStatus } : r));
         }
+    };
+
+    const openReassignModal = (recipeId: string) => {
+        setAssignRecipeId(recipeId);
+        setShowUserSelector(true);
+    };
+
+    const handleReassignOwner = async (newUserId: string) => {
+        if (!assignRecipeId) return;
+
+        const { error } = await supabase
+            .from('rb_recipes')
+            .update({ user_id: newUserId })
+            .eq('id', assignRecipeId);
+
+        if (error) {
+            console.error('Error reassigning recipe:', error);
+            alert('Failed to reassign recipe.');
+        } else {
+            // Update local state
+            setRecipes(recipes.map(r => r.id === assignRecipeId ? { ...r, user_id: newUserId } : r));
+            // alert('Recipe owner reassigned successfully.'); // Optional feedback
+        }
+
+        setShowUserSelector(false);
+        setAssignRecipeId(null);
     };
 
     // Derived Stats
@@ -348,9 +379,17 @@ const AdminDashboard = () => {
                                             </button>
                                         </td>
                                         <td style={{ padding: '1rem', textAlign: 'right', display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
-                                            <Link to={`/edit-recipe/${recipe.id}`} className="btn" style={{ padding: '0.5rem', backgroundColor: '#F5F5F5' }}>
+                                            <Link to={`/edit-recipe/${recipe.id}`} className="btn" style={{ padding: '0.5rem', backgroundColor: '#F5F5F5' }} title="Edit">
                                                 <Edit size={16} />
                                             </Link>
+                                            <button
+                                                onClick={() => openReassignModal(recipe.id)}
+                                                className="btn"
+                                                style={{ padding: '0.5rem', backgroundColor: '#E3F2FD', color: '#1976D2' }}
+                                                title="Reassign Owner"
+                                            >
+                                                <UserCheck size={16} />
+                                            </button>
                                             <AlertDialog.Root>
                                                 <AlertDialog.Trigger asChild>
                                                     <button
@@ -405,6 +444,13 @@ const AdminDashboard = () => {
                     </div>
                 </div>
             )}
+
+            <UserSelector
+                isOpen={showUserSelector}
+                onClose={() => setShowUserSelector(false)}
+                onSelect={handleReassignOwner}
+                title="Reassign Recipe Owner"
+            />
         </div>
     );
 };

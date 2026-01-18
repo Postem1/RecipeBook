@@ -3,10 +3,11 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { type Recipe } from '../components/recipes/RecipeCard';
 import { useAuth } from '../context/AuthContext';
-import { Clock, Users, Heart, Trash2, Edit, Share2, Lock, Unlock } from 'lucide-react';
+import { Clock, Users, Heart, Trash2, Edit, Share2, Lock, Unlock, UserCheck } from 'lucide-react';
 import CommentSection from '../components/comments/CommentSection';
 import * as Dialog from '@radix-ui/react-dialog';
 import * as AlertDialog from '@radix-ui/react-alert-dialog';
+import UserSelector from '../components/admin/UserSelector';
 
 const RecipeDetail = () => {
     const { id } = useParams<{ id: string }>();
@@ -18,6 +19,7 @@ const RecipeDetail = () => {
     const [shareEmail, setShareEmail] = useState('');
     const [isSharing, setIsSharing] = useState(false);
     const [shareMessage, setShareMessage] = useState<string | null>(null);
+    const [showUserSelector, setShowUserSelector] = useState(false);
 
     useEffect(() => {
         if (id) {
@@ -135,6 +137,24 @@ const RecipeDetail = () => {
         } else {
             navigate('/');
         }
+    };
+
+    const handleReassign = async (newUserId: string) => {
+        if (!recipe) return;
+
+        const { error } = await supabase
+            .from('rb_recipes')
+            .update({ user_id: newUserId })
+            .eq('id', id);
+
+        if (error) {
+            console.error('Error reassigning:', error);
+            alert('Error reassigning recipe.');
+        } else {
+            // Refresh recipe to show new owner
+            fetchRecipe();
+        }
+        setShowUserSelector(false);
     };
 
     if (loading) return <div style={{ textAlign: 'center', padding: '3rem' }}>Loading...</div>;
@@ -256,6 +276,17 @@ const RecipeDetail = () => {
                                     <>
                                         <Link to={`/edit-recipe/${recipe.id}`} className="btn btn-outline"><Edit size={20} /></Link>
 
+                                        {isAdmin && (
+                                            <button
+                                                onClick={() => setShowUserSelector(true)}
+                                                className="btn btn-outline"
+                                                title="Reassign Owner (Admin)"
+                                                style={{ color: '#1976D2', borderColor: '#1976D2' }}
+                                            >
+                                                <UserCheck size={20} />
+                                            </button>
+                                        )}
+
                                         <AlertDialog.Root>
                                             <AlertDialog.Trigger asChild>
                                                 <button className="btn btn-outline" style={{ color: 'var(--color-error)' }} title="Delete Recipe">
@@ -324,6 +355,13 @@ const RecipeDetail = () => {
                     </div>
                 </div>
             </div>
+
+            <UserSelector
+                isOpen={showUserSelector}
+                onClose={() => setShowUserSelector(false)}
+                onSelect={handleReassign}
+                title="Reassign Recipe"
+            />
         </div>
     );
 };
