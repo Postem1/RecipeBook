@@ -214,8 +214,8 @@ const RecipeDetail = () => {
             <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
                 <div style={{ flex: 2, minWidth: '300px' }}>
                     <div className="card" style={{ padding: '2rem', marginBottom: '2rem' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', alignItems: 'center' }}>
-                            <h2 style={{ fontSize: '1.5rem', color: 'var(--color-primary)' }}>Instructions</h2>
+                        <div className="recipe-action-header">
+                            <h2 style={{ fontSize: '1.5rem', color: 'var(--color-primary)', margin: 0 }}>Instructions</h2>
                             <div style={{ display: 'flex', gap: '0.5rem' }}>
                                 <button onClick={toggleFavorite} className="btn btn-outline" style={{ color: isFavorite ? 'red' : 'inherit' }} title={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}>
                                     <Heart fill={isFavorite ? 'red' : 'none'} size={20} />
