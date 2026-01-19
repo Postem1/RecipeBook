@@ -5,11 +5,25 @@ This project is a modern, social Recipe Book application built with a React fron
 
 ## Architecture
 
-### The 3-Layer Agentic System
-The project structure is designed to separate intent from execution:
-1.  **Directives (`directives/`)**: High-level Standard Operating Procedures (SOPs) written in Markdown. These define *what* needs to be done.
-2.  **Orchestration (AI Agent)**: The reasoning layer that reads directives, plans, and invokes tools.
-3.  **Execution (`execution/`)**: Deterministic Python scripts that perform the actual work (file manipulation, API calls, data processing).
+## Architecture
+
+### The Antigravity Agent System
+This project utilizes the **Antigravity Kit** to drive AI-assisted development:
+
+-   **Specialist Agents**: Role-based personas like `frontend-specialist` and `database-architect` ensure expert-level code generation.
+-   **Skill Modules**: dynamic knowledge bases loaded from `.agent/skills/` provide vetted patterns for Security, UI/UX, and Performance.
+-   **Automated Workflows**: Slash commands (e.g., `/enhance`) trigger structured multi-step processes for reliable execution.
+
+### Design System
+The application uses a refined design system defined in `src/styles/index.css`:
+-   **Typography**: 'Outfit' and 'Inter' font stack with optimized line heights (1.5 body) and readable line lengths (`max-width: 65ch`).
+-   **Visual Depth**: A tiered shadow system (`--shadow-soft`, `--shadow-hover`) to create hierarchy and depth.
+-   **Interactions**: Standardized transition timings for smooth hover and focus states.
+
+### Security Enhancements
+-   **HTTP Headers**: Strict security headers (CSP, X-Frame-Options, X-Content-Type-Options) configured in `vercel.json`.
+-   **Dependency Integrity**: Enforced via `package-lock.json` to prevent supply chain attacks.
+-   **Auth**: Row Level Security (RLS) policies on Supabase ensure data isolation.
 
 ### Tech Stack
 -   **Frontend**: React (v18), TypeScript, Vite (v6)

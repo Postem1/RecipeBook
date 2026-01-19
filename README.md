@@ -51,7 +51,8 @@ A modern, social Recipe Book application built with React, TypeScript, and Supab
 
 ## Architecture
 
-This project follows a 3-layer agentic architecture designed for AI-assisted development:
-1.  **Directives**: High-level Standard Operating Procedures (SOPs).
-2.  **Execution Scripts**: Python scripts for deterministic tasks.
-3.  **Application Code**: The core React/Supabase application.
+This project is powered by the **Antigravity Kit**, a comprehensive AI development system:
+
+1.  **Agents** (`.agent/agents/`): 16 specialist personas (e.g., `frontend-specialist`, `security-auditor`) that provide domain-specific expertise.
+2.  **Skills** (`.agent/skills/`): 40+ modular knowledge bases covering React patterns, Security best practices, Database design, and more.
+3.  **Workflows** (`.agent/workflows/`): Standardized procedures executed via slash commands (e.g., `/enhance`, `/debug`, `/deploy`) to ensure consistent, high-quality results.
