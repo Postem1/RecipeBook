@@ -188,9 +188,9 @@ const AdminDashboard = () => {
 
     return (
         <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 1rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem' }}>
+            <div className="admin-header">
                 <h1 style={{ fontSize: '2.5rem', color: 'var(--color-text-primary)' }}>Superuser Dashboard</h1>
-                <div style={{ display: 'flex', gap: '1rem', backgroundColor: 'var(--color-bg-white)', padding: '0.5rem', borderRadius: '50px', boxShadow: 'var(--shadow-sm)' }}>
+                <div className="admin-tabs">
                     {[
                         { id: 'overview', icon: LayoutDashboard, label: 'Overview' },
                         { id: 'users', icon: Users, label: 'Users' },
@@ -222,14 +222,14 @@ const AdminDashboard = () => {
 
             {/* OVERVIEW TAB */}
             {activeTab === 'overview' && (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
                     <div className="card" style={{ padding: '2rem', display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
                         <div style={{ padding: '1rem', backgroundColor: '#E3F2FD', borderRadius: '50%', color: '#2196F3' }}>
                             <Users size={40} />
                         </div>
                         <div>
                             <div style={{ fontSize: '3rem', fontWeight: 'bold' }}>{totalUsers}</div>
-                            <div style={{ color: 'var(--color-text-secondary)' }}>Total Users</div>
+                            <div style={{ color: 'var(--color-text-secondary)', fontWeight: 500 }}>Total Users</div>
                         </div>
                     </div>
                     <div className="card" style={{ padding: '2rem', display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
@@ -238,7 +238,7 @@ const AdminDashboard = () => {
                         </div>
                         <div>
                             <div style={{ fontSize: '3rem', fontWeight: 'bold' }}>{totalRecipes}</div>
-                            <div style={{ color: 'var(--color-text-secondary)' }}>Total Recipes</div>
+                            <div style={{ color: 'var(--color-text-secondary)', fontWeight: 500 }}>Total Recipes</div>
                         </div>
                     </div>
                     <div className="card" style={{ padding: '2rem', display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
@@ -247,7 +247,7 @@ const AdminDashboard = () => {
                         </div>
                         <div>
                             <div style={{ fontSize: '3rem', fontWeight: 'bold' }}>{privateRecipes}</div>
-                            <div style={{ color: 'var(--color-text-secondary)' }}>Private Recipes</div>
+                            <div style={{ color: 'var(--color-text-secondary)', fontWeight: 500 }}>Private Recipes</div>
                         </div>
                     </div>
                 </div>
@@ -269,7 +269,7 @@ const AdminDashboard = () => {
                             />
                         </div>
                     </div>
-                    <div style={{ overflowX: 'auto' }}>
+                    <div className="hidden-mobile" style={{ overflowX: 'auto' }}>
                         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                             <thead>
                                 <tr style={{ borderBottom: '2px solid var(--color-border)' }}>
@@ -370,6 +370,107 @@ const AdminDashboard = () => {
                             </tbody>
                         </table>
                     </div>
+
+                    {/* Mobile Card View for Users */}
+                    <div className="hidden-desktop" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        {filteredUsers.map(profile => (
+                            <div key={profile.id} className="card" style={{
+                                padding: '1.5rem',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '1rem'
+                            }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+                                    <div>
+                                        <div style={{ fontWeight: '700', fontSize: '1.1rem', wordBreak: 'break-all' }}>{profile.email}</div>
+                                        <div style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>{profile.username || 'No Username'}</div>
+                                    </div>
+                                    <span style={{
+                                        padding: '0.25rem 0.75rem',
+                                        borderRadius: '20px',
+                                        backgroundColor: profile.role === 'admin' ? '#E3F2FD' : '#F5F5F5',
+                                        color: profile.role === 'admin' ? '#2196F3' : '#666',
+                                        fontSize: '0.8rem',
+                                        fontWeight: '600',
+                                        whiteSpace: 'nowrap'
+                                    }}>
+                                        {profile.role || 'user'}
+                                    </span>
+                                </div>
+
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.5rem' }}>
+                                    <div style={{ fontSize: '0.75rem', color: '#ccc' }}>ID: {profile.id.slice(0, 8)}...</div>
+
+                                    {profile.id !== user?.id && (
+                                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                            <button
+                                                onClick={() => handleToggleRole(profile)}
+                                                className="btn"
+                                                style={{
+                                                    backgroundColor: profile.role === 'admin' ? '#FFF3E0' : '#E8F5E9',
+                                                    color: profile.role === 'admin' ? '#FF9800' : '#4CAF50',
+                                                    padding: '0.5rem',
+                                                    width: '40px', height: '40px', borderRadius: '50%'
+                                                }}
+                                            >
+                                                {profile.role === 'admin' ? <ShieldOff size={18} /> : <Shield size={18} />}
+                                            </button>
+                                            <AlertDialog.Root>
+                                                <AlertDialog.Trigger asChild>
+                                                    <button
+                                                        className="btn"
+                                                        style={{
+                                                            backgroundColor: '#FFEBEE',
+                                                            color: '#D32F2F',
+                                                            padding: '0.5rem',
+                                                            width: '40px', height: '40px', borderRadius: '50%'
+                                                        }}
+                                                    >
+                                                        <Trash2 size={18} />
+                                                    </button>
+                                                </AlertDialog.Trigger>
+                                                <AlertDialog.Portal>
+                                                    <AlertDialog.Overlay style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 100 }} />
+                                                    <AlertDialog.Content style={{
+                                                        position: 'fixed',
+                                                        top: '50%',
+                                                        left: '50%',
+                                                        transform: 'translate(-50%, -50%)',
+                                                        backgroundColor: 'white',
+                                                        padding: '2rem',
+                                                        borderRadius: 'var(--radius-md)',
+                                                        boxShadow: 'var(--shadow-lg)',
+                                                        maxWidth: '350px',
+                                                        width: '90%',
+                                                        zIndex: 101
+                                                    }}>
+                                                        <AlertDialog.Title style={{ marginBottom: '1rem', fontSize: '1.1rem', fontWeight: 'bold' }}>Delete {profile.email}?</AlertDialog.Title>
+                                                        <AlertDialog.Description style={{ marginBottom: '1.5rem', color: 'var(--color-text-light)', fontSize: '0.9rem' }}>
+                                                            Permanently delete this user and all their data?
+                                                        </AlertDialog.Description>
+                                                        <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                                                            <AlertDialog.Cancel asChild>
+                                                                <button className="btn btn-outline" style={{ padding: '0.5rem 1rem' }}>Cancel</button>
+                                                            </AlertDialog.Cancel>
+                                                            <AlertDialog.Action asChild>
+                                                                <button
+                                                                    onClick={() => handleDeleteUser(profile.id, profile.email)}
+                                                                    className="btn btn-primary"
+                                                                    style={{ backgroundColor: 'var(--color-error)', borderColor: 'var(--color-error)', padding: '0.5rem 1rem' }}
+                                                                >
+                                                                    Delete
+                                                                </button>
+                                                            </AlertDialog.Action>
+                                                        </div>
+                                                    </AlertDialog.Content>
+                                                </AlertDialog.Portal>
+                                            </AlertDialog.Root>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             )}
 
@@ -389,7 +490,7 @@ const AdminDashboard = () => {
                             />
                         </div>
                     </div>
-                    <div style={{ overflowX: 'auto' }}>
+                    <div className="hidden-mobile" style={{ overflowX: 'auto' }}>
                         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                             <thead>
                                 <tr style={{ borderBottom: '2px solid var(--color-border)' }}>
@@ -484,8 +585,99 @@ const AdminDashboard = () => {
                             </tbody>
                         </table>
                     </div>
+
+                    {/* Mobile Card View for Recipes */}
+                    <div className="hidden-desktop" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        {filteredRecipes.map(recipe => (
+                            <div key={recipe.id} className="card" style={{
+                                padding: '1.5rem',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '1rem'
+                            }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+                                    <div style={{ flex: 1 }}>
+                                        <Link to={`/edit-recipe/${recipe.id}`} style={{ fontWeight: '700', fontSize: '1.1rem', textDecoration: 'none', color: 'inherit', display: 'block', marginBottom: '0.5rem' }}>
+                                            {recipe.title}
+                                        </Link>
+                                        <button
+                                            onClick={() => toggleRecipePrivacy(recipe.id, recipe.is_private)}
+                                            style={{
+                                                background: 'none', border: 'none', cursor: 'pointer',
+                                                color: recipe.is_private ? '#FF9800' : '#4CAF50',
+                                                fontSize: '0.9rem',
+                                                display: 'flex', alignItems: 'center', gap: '0.25rem',
+                                                padding: 0
+                                            }}
+                                        >
+                                            {recipe.is_private ? 'Private 🔒' : 'Public 🌍'}
+                                        </button>
+                                    </div>
+                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                        <Link to={`/edit-recipe/${recipe.id}`} className="btn" style={{ padding: '0.5rem', backgroundColor: '#F5F5F5', width: '40px', height: '40px', borderRadius: '50%' }}>
+                                            <Edit size={16} />
+                                        </Link>
+                                        <button
+                                            onClick={() => openReassignModal(recipe.id)}
+                                            className="btn"
+                                            style={{ padding: '0.5rem', backgroundColor: '#E3F2FD', color: '#1976D2', width: '40px', height: '40px', borderRadius: '50%' }}
+                                        >
+                                            <UserCheck size={16} />
+                                        </button>
+                                        <AlertDialog.Root>
+                                            <AlertDialog.Trigger asChild>
+                                                <button
+                                                    className="btn"
+                                                    style={{ padding: '0.5rem', backgroundColor: '#FFEBEE', color: '#D32F2F', width: '40px', height: '40px', borderRadius: '50%' }}
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            </AlertDialog.Trigger>
+                                            <AlertDialog.Portal>
+                                                <AlertDialog.Overlay style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 100 }} />
+                                                <AlertDialog.Content style={{
+                                                    position: 'fixed',
+                                                    top: '50%',
+                                                    left: '50%',
+                                                    transform: 'translate(-50%, -50%)',
+                                                    backgroundColor: 'white',
+                                                    padding: '2rem',
+                                                    borderRadius: 'var(--radius-md)',
+                                                    boxShadow: 'var(--shadow-lg)',
+                                                    maxWidth: '350px',
+                                                    width: '90%',
+                                                    zIndex: 101
+                                                }}>
+                                                    <AlertDialog.Title style={{ marginBottom: '1rem', fontSize: '1.25rem', fontWeight: 'bold' }}>Delete Recipe?</AlertDialog.Title>
+                                                    <AlertDialog.Description style={{ marginBottom: '1.5rem', color: 'var(--color-text-light)' }}>
+                                                        Are you sure you want to delete <strong>"{recipe.title}"</strong>?
+                                                    </AlertDialog.Description>
+                                                    <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+                                                        <AlertDialog.Cancel asChild>
+                                                            <button className="btn btn-outline">Cancel</button>
+                                                        </AlertDialog.Cancel>
+                                                        <AlertDialog.Action asChild>
+                                                            <button
+                                                                onClick={() => handleDeleteRecipe(recipe.id)}
+                                                                className="btn btn-primary"
+                                                                style={{ backgroundColor: 'var(--color-error)', borderColor: 'var(--color-error)' }}
+                                                            >
+                                                                Yes, Delete
+                                                            </button>
+                                                        </AlertDialog.Action>
+                                                    </div>
+                                                </AlertDialog.Content>
+                                            </AlertDialog.Portal>
+                                        </AlertDialog.Root>
+                                    </div>
+                                </div>
+                                <div style={{ fontSize: '0.8rem', color: '#999' }}>Owner ID: {recipe.user_id.slice(0, 8)}...</div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
-            )}
+            )
+            }
 
             <UserSelector
                 isOpen={showUserSelector}
@@ -540,7 +732,7 @@ const AdminDashboard = () => {
                 </AlertDialog.Portal>
             </AlertDialog.Root>
 
-        </div>
+        </div >
     );
 };
 

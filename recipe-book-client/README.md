@@ -1,73 +1,64 @@
-# React + TypeScript + Vite
+# RecipeBook - Social Recipe Manager
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+RecipeBook is a modern, full-stack application for managing and sharing recipes. Built with React, Supabase, and a "Solar Flare" design system, it offers a fast, responsive, and visually engaging experience for food lovers.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 🍳 Recipe Management
+*   **Create & Edit**: Rich text editing for ingredients and steps.
+*   **Private vs Public**: Keep secret family recipes private or share them with the world.
+*   **Images**: Upload beautiful food photography (Supabase Storage).
+*   **Filtering**: Filter by meal type (Breakfast, Lunch, Dinner, Snack) or search by keyword.
 
-## React Compiler
+### 🤝 Social & Sharing
+*   **Share Recipes**: Share private recipes with specific users via email.
+*   **Favorites**: Save recipes you love for quick access.
+*   **Community**: Public recipes appear in the global "Discover" feed.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 🛡️ Admin Dashboard (Superusers)
+*   **User Management**: View, promote, or delete users.
+*   **Recipe Oversight**: Monitor all public/private recipes.
+*   **Stats**: Quick view of total users and recipes.
+*   **Mobile Optimized**: Fully responsive card-based layout for mobile admin tasks.
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+*   **Frontend**: React (Vite), TypeScript
+*   **Backend**: Supabase (PostgreSQL, Auth, Storage, Edge Functions)
+*   **Styling**: Custom CSS variables, "Solar Flare" Design System
+*   **Deploy**: Vercel
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Design System: "Solar Flare"
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+The UI has been overhauled to follow the "Solar Flare" aesthetic:
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+*   **Palette**: Warm, organic tones (Coral Red, Amber Orange) against clean white backgrounds.
+*   **Typography**: Modern sans-serif with optimized line heights and readability.
+*   **Interactions**:
+    *   **Buttons**: Gradient backgrounds with subtle hover lifts (`translateY`).
+    *   **Inputs**: Global accessible input styling with focus rings.
+    *   **Navbar**: Dynamic "glassmorphism" effect that responds to scroll position.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Getting Started
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+1.  **Install Dependencies**:
+    ```bash
+    npm install
+    ```
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+2.  **Environment Setup**:
+    Create a `.env` file with your Supabase credentials:
+    ```env
+    VITE_SUPABASE_URL=your_project_url
+    VITE_SUPABASE_ANON_KEY=your_anon_key
+    ```
+
+3.  **Run Locally**:
+    ```bash
+    npm run dev
+    ```
+
+4.  **Build**:
+    ```bash
+    npm run build
+    ```

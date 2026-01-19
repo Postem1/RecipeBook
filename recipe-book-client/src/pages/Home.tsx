@@ -42,124 +42,141 @@ const Home = () => {
 
     return (
         <div>
-            {/* Hero Section with Organic Shape Background */}
+            {/* Hero Section */}
             <section style={{
-                textAlign: 'center',
-                padding: '6rem 0 8rem',
                 position: 'relative',
-                marginBottom: '2rem'
+                height: '80vh', // Full viewport height for impact
+                minHeight: '600px',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                textAlign: 'center',
+                marginBottom: '4rem',
+                color: 'white',
+                overflow: 'hidden'
             }}>
-                {/* Decorative Background Shape */}
+                {/* Background Image with Parallax-like fixed attachment */}
                 <div style={{
-                    position: 'absolute',
-                    top: '-10%',
-                    right: '-5%',
-                    width: '600px',
-                    height: '600px',
-                    backgroundColor: 'rgba(244, 208, 63, 0.15)', // var(--color-primary) with opacity
-                    borderRadius: '44% 56% 45% 55% / 37% 38% 62% 63%',
-                    zIndex: -1,
-                    filter: 'blur(60px)'
-                }} />
-
-                <div style={{
-                    position: 'absolute',
-                    top: '20%',
-                    left: '-10%',
-                    width: '400px',
-                    height: '400px',
-                    backgroundColor: 'rgba(39, 174, 96, 0.1)', // var(--color-secondary) with opacity
-                    borderRadius: '56% 44% 73% 27% / 37% 68% 32% 63%',
-                    zIndex: -1,
-                    filter: 'blur(50px)'
-                }} />
-
-                <h1 style={{
-                    fontSize: '4rem',
-                    marginBottom: '1.5rem',
-                    color: 'var(--color-text-primary)',
-                    letterSpacing: '-0.03em',
-                    lineHeight: '1.1'
-                }}>
-                    Fresh & <span style={{ color: 'var(--color-secondary)' }}>Organic</span><br />
-                    Recipe Collection
-                </h1>
-                <p style={{
-                    color: 'var(--color-text-secondary)',
-                    fontSize: '1.35rem',
-                    maxWidth: '600px',
-                    margin: '0 auto 4rem',
-                    lineHeight: '1.6'
-                }}>
-                    Discover delicious meals for every occasion. Curated by our community of food lovers.
-                </p>
-
-                {/* Floating Search Bar */}
-                <div style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    marginBottom: '3rem',
-                    position: 'relative',
-                    zIndex: 10
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: '80vh',
+                    zIndex: 0,
+                    backgroundImage: 'url("https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?auto=format&fit=crop&q=80&w=1920")',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    transform: `translateY(${scrollY * 0.5}px)`,
                 }}>
                     <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        backgroundColor: 'var(--color-bg-white)',
-                        padding: '0.75rem 1.5rem',
-                        borderRadius: '50px',
-                        boxShadow: 'var(--shadow-hover)',
-                        width: '100%',
-                        maxWidth: '600px',
-                        border: '1px solid var(--color-border)'
-                    }}>
-                        <Search size={24} color="var(--color-text-secondary)" />
-                        <input
-                            type="text"
-                            placeholder="What are you craving today?"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            style={{
-                                border: 'none',
-                                outline: 'none',
-                                paddingLeft: '1rem',
-                                width: '100%',
-                                fontSize: '1.1rem',
-                                color: 'var(--color-text-primary)',
-                                fontWeight: '500'
-                            }}
-                        />
-                    </div>
+                        position: 'absolute',
+                        inset: 0,
+                        backgroundColor: 'rgba(0,0,0,0.3)', // Lighter overlay for vibrancy
+                        background: 'linear-gradient(to bottom, rgba(45, 55, 72, 0.4), rgba(247, 249, 252, 1))'
+                    }} />
                 </div>
 
-                {/* Category Pills */}
+                {/* Hero Content */}
                 <div style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    gap: '1rem',
-                    flexWrap: 'wrap',
-                    padding: '0 1rem'
+                    position: 'relative',
+                    zIndex: 10,
+                    maxWidth: '800px',
+                    padding: '0 1rem',
+                    animation: 'fadeInUp 0.8s ease-out forwards'
                 }}>
-                    {categories.map(cat => (
-                        <button
-                            key={cat}
-                            onClick={() => setSelectedCategory(cat)}
-                            style={{
-                                padding: '0.6rem 1.5rem',
-                                borderRadius: '50px',
-                                border: selectedCategory === cat ? 'none' : '2px solid var(--color-border)',
-                                backgroundColor: selectedCategory === cat ? 'var(--color-text-primary)' : 'transparent',
-                                color: selectedCategory === cat ? '#fff' : 'var(--color-text-secondary)',
-                                fontWeight: '600',
-                                fontSize: '0.95rem',
-                                cursor: 'pointer',
-                                transition: 'all 0.2s ease',
-                                boxShadow: selectedCategory === cat ? '0 4px 15px rgba(0,0,0,0.2)' : 'none'
-                            }}
+                    <h1 style={{
+                        fontSize: 'clamp(3rem, 6vw, 5rem)',
+                        marginBottom: '1.5rem',
+                        color: 'white',
+                        textShadow: '0 4px 20px rgba(0,0,0,0.3)',
+                        lineHeight: '1.1'
+                    }}>
+                        Taste the <span style={{ color: 'var(--color-primary)' }}>Energy</span>
+                    </h1>
+                    <p style={{
+                        color: 'rgba(255,255,255,0.9)',
+                        fontSize: 'clamp(1.2rem, 2vw, 1.5rem)',
+                        marginBottom: '3rem',
+                        lineHeight: '1.6',
+                        textShadow: '0 2px 10px rgba(0,0,0,0.3)'
+                    }}>
+                        Discover vibrant, healthy recipes that fuel your day. Join our community of food lovers.
+                    </p>
+
+                    {/* Floating Search Bar */}
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        marginBottom: '2rem',
+                    }}>
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                            padding: '0.75rem 1.5rem',
+                            borderRadius: '50px',
+                            boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
+                            width: '450px',
+                            maxWidth: '100%',
+                            backdropFilter: 'blur(10px)',
+                            transform: 'translateY(0)',
+                            transition: 'transform 0.3s ease'
+                        }}
+                            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
+                            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
                         >
-                            {cat}
-                        </button>
-                    ))}
+                            <Search size={24} color="var(--color-primary)" />
+                            <input
+                                type="text"
+                                placeholder="What are you craving today?"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                style={{
+                                    border: 'none',
+                                    outline: 'none',
+                                    paddingLeft: '1rem',
+                                    width: '100%',
+                                    fontSize: '1.1rem',
+                                    backgroundColor: 'transparent',
+                                    color: 'var(--color-text-primary)',
+                                    fontWeight: '500'
+                                }}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Quick Category Pills */}
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        gap: '0.75rem',
+                        flexWrap: 'wrap'
+                    }}>
+                        {categories.slice(0, 4).map((cat, i) => (
+                            <button
+                                key={cat}
+                                onClick={() => setSelectedCategory(cat)}
+                                className={`delay-${(i + 1) * 100}`}
+                                style={{
+                                    padding: '0.5rem 1.25rem',
+                                    borderRadius: '50px',
+                                    border: selectedCategory === cat ? 'none' : '1px solid rgba(255,255,255,0.4)',
+                                    backgroundColor: selectedCategory === cat ? 'var(--color-primary)' : 'rgba(0,0,0,0.4)',
+                                    color: 'white',
+                                    fontWeight: '600',
+                                    fontSize: '0.9rem',
+                                    cursor: 'pointer',
+                                    backdropFilter: 'blur(4px)',
+                                    transition: 'all 0.2s ease',
+                                    animation: 'fadeInUp 0.6s ease-out forwards',
+                                    opacity: 0
+                                }}
+                            >
+                                {cat}
+                            </button>
+                        ))}
+                    </div>
                 </div>
             </section>
 
