@@ -19,9 +19,14 @@ The application uses a refined design system defined in `src/styles/index.css`:
 -   **Typography**: 'Outfit' and 'Inter' font stack with optimized line heights (1.5 body) and readable line lengths (`max-width: 65ch`).
 -   **Visual Depth**: A tiered shadow system (`--shadow-soft`, `--shadow-hover`) to create hierarchy and depth.
 -   **Interactions**: Standardized transition timings for smooth hover and focus states.
+-   **Mobile Responsiveness**:
+    -   **Action Buttons**: Adaptive layouts (Flex Row → Flex Column) for action buttons on mobile.
+    -   **Admin Wrappers**: Flex-wrapping enabled for superuser controls to prevent overflow on small screens.
 
 ### Security Enhancements
 -   **HTTP Headers**: Strict security headers (CSP, X-Frame-Options, X-Content-Type-Options) configured in `vercel.json`.
+    -   *Update*: CSP `img-src` relaxed to allow HTTPS images for reliable loading.
+    -   *Update*: `Referrer-Policy: no-referrer` added to bypass external image hotlink protections.
 -   **Dependency Integrity**: Enforced via `package-lock.json` to prevent supply chain attacks.
 -   **Auth**: Row Level Security (RLS) policies on Supabase ensure data isolation.
 
@@ -90,3 +95,20 @@ The app will be available at `http://localhost:5173`.
 ### Linting & Type Checking
 -   Lint: `npm run lint`
 -   Type Check: `npx tsc -b`
+
+## Deployment
+
+The application is configured for deployment on **Vercel**.
+
+### Configuration (`vercel.json`)
+A `vercel.json` file is included to handle single-page application (SPA) routing and security:
+-   **Rewrites**: Redirects all requests to `index.html` to support React Router.
+-   **Headers**: Sets security headers including `Content-Security-Policy` (CSP) and `X-Content-Type-Options`.
+
+### Deploying
+1.  Connect your GitHub repository to Vercel.
+2.  Import the project (root directory: `recipe-book-client`).
+3.  Set the Environment Variables in Vercel project settings:
+    -   `VITE_SUPABASE_URL`
+    -   `VITE_SUPABASE_ANON_KEY`
+4.  Deploy.

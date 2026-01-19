@@ -24,6 +24,7 @@ The **Home Page** displays a feed of recipes.
 -   **Search**: Use the search bar at the top to find recipes by title or ingredients.
 -   **Filters**: Click the category buttons (e.g., *Breakfast*, *Lunch*) to narrow down the list.
 -   **View Details**: Click on any recipe card to view the full details, including ingredients and instructions.
+-   **Mobile View**: The interface is fully responsive, with action buttons automatically stacking for better accessibility on smaller screens.
 
 ## Managing Your Recipes
 
