@@ -198,7 +198,7 @@ const AdminDashboard = () => {
                     ].map(tab => (
                         <button
                             key={tab.id}
-                            onClick={() => setActiveTab(tab.id as any)}
+                            onClick={() => setActiveTab(tab.id as typeof activeTab)}
                             style={{
                                 display: 'flex',
                                 alignItems: 'center',

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../context/AuthContext';
 import { Trash2 } from 'lucide-react';
@@ -22,11 +22,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ recipeId, recipeOwnerId
     const [newComment, setNewComment] = useState('');
     const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        fetchComments();
-    }, [recipeId]);
-
-    const fetchComments = async () => {
+    const fetchComments = useCallback(async () => {
         // 1. Fetch comments
         const { data: commentsData, error } = await supabase
             .from('rb_comments')
@@ -48,7 +44,12 @@ const CommentSection: React.FC<CommentSectionProps> = ({ recipeId, recipeOwnerId
 
         // Simplification: Just show comments.
         setComments(commentsData || []);
-    };
+    }, [recipeId]);
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        fetchComments();
+    }, [fetchComments]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

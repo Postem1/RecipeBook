@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
@@ -25,13 +25,8 @@ const RecipeForm = () => {
 
     const categories = ['Breakfast', 'Lunch', 'Dinner', 'Dessert', 'Snacks'];
 
-    useEffect(() => {
-        if (id) {
-            fetchRecipe();
-        }
-    }, [id]);
-
-    const fetchRecipe = async () => {
+    const fetchRecipe = useCallback(async () => {
+        if (!id) return;
         try {
             const { data, error } = await supabase
                 .from('rb_recipes')
@@ -58,7 +53,13 @@ const RecipeForm = () => {
         } finally {
             setFetching(false);
         }
-    };
+    }, [id, navigate]);
+
+    useEffect(() => {
+        if (id) {
+            fetchRecipe();
+        }
+    }, [id, fetchRecipe]);
 
     const handleIngredientChange = (index: number, value: string) => {
         const newIngredients = [...ingredients];

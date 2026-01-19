@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import RecipeCard, { type Recipe } from '../components/recipes/RecipeCard';
 import { useAuth } from '../context/AuthContext';
@@ -9,11 +9,10 @@ const SharedWithMe = () => {
     const [recipes, setRecipes] = useState<Recipe[]>([]);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        if (user) fetchSharedRecipes();
-    }, [user]);
 
-    const fetchSharedRecipes = async () => {
+
+    const fetchSharedRecipes = useCallback(async () => {
+        if (!user) return;
         try {
             setLoading(true);
             // Fetch shared recipes
@@ -23,20 +22,25 @@ const SharedWithMe = () => {
                     recipe_id,
                     recipe:rb_recipes (*)
                 `)
-                .eq('user_id', user!.id)
+                .eq('user_id', user.id)
                 .order('created_at', { ascending: false });
 
             if (error) throw error;
 
             // Transform data to extract the recipe object
-            const sharedRecipes = data.map((item: any) => item.recipe).filter((r: any) => r !== null);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const sharedRecipes = (data as any[]).map((item) => item.recipe).filter((r) => r !== null);
             setRecipes(sharedRecipes || []);
         } catch (error) {
             console.error('Error fetching shared recipes:', error);
         } finally {
             setLoading(false);
         }
-    };
+    }, [user]);
+
+    useEffect(() => {
+        fetchSharedRecipes();
+    }, [fetchSharedRecipes]);
 
     return (
         <div>

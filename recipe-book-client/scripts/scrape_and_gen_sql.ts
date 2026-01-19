@@ -2,7 +2,6 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import fs from 'fs';
-import path from 'path';
 
 // User IDs fetched from DB
 const USER_IDS = [
@@ -116,7 +115,9 @@ async function scrape() {
                 ingredients.push($p(el).text().trim());
             });
             if (ingredients.length === 0) {
-                $p('.ingredient-list li').each((_, el) => ingredients.push($p(el).text().trim()));
+                $p('.ingredient-list li').each((_, el) => {
+                    ingredients.push($p(el).text().trim());
+                });
             }
 
             let instructions = '';
@@ -150,8 +151,8 @@ async function scrape() {
                 });
             }
 
-        } catch (e) {
-            console.error(`Failed ${link}:`, e.message);
+        } catch (e: unknown) {
+            console.error(`Failed ${link}:`, (e as Error).message);
         }
 
         // Polite delay

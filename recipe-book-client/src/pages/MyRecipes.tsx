@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'; import { supabase } from '../lib/supabase';
+import { useEffect, useState, useCallback } from 'react'; import { supabase } from '../lib/supabase';
 import RecipeCard, { type Recipe } from '../components/recipes/RecipeCard'; import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 import { Plus } from 'lucide-react';
@@ -8,17 +8,14 @@ const MyRecipes = () => {
     const [recipes, setRecipes] = useState<Recipe[]>([]);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        if (user) fetchMyRecipes();
-    }, [user]);
-
-    const fetchMyRecipes = async () => {
+    const fetchMyRecipes = useCallback(async () => {
+        if (!user) return;
         try {
             setLoading(true);
             const { data, error } = await supabase
                 .from('rb_recipes')
                 .select('*')
-                .eq('user_id', user!.id)
+                .eq('user_id', user.id)
                 .order('created_at', { ascending: false });
 
             if (error) throw error;
@@ -28,7 +25,11 @@ const MyRecipes = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [user]);
+
+    useEffect(() => {
+        if (user) fetchMyRecipes();
+    }, [user, fetchMyRecipes]);
 
     return (
         <div>

@@ -1,6 +1,5 @@
 
 import fs from 'fs';
-import path from 'path';
 
 // Define the User IDs directly here
 const USER_IDS = [
@@ -51,7 +50,7 @@ function generateSeed() {
         let publicCount = 0;
         const targetPublic = 20;
 
-        recipes.forEach((recipe, index) => {
+        recipes.forEach((recipe) => {
             // Random user
             const userId = USER_IDS[Math.floor(Math.random() * USER_IDS.length)];
 

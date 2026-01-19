@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { type Recipe } from '../components/recipes/RecipeCard';
@@ -13,7 +13,7 @@ const RecipeDetail = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const { user, isAdmin } = useAuth();
-    const [recipe, setRecipe] = useState<Recipe & { ingredients: any, instructions: string, user_id: string, rb_profiles: { username: string | null } } | null>(null);
+    const [recipe, setRecipe] = useState<Recipe & { ingredients: string[], instructions: string, user_id: string, rb_profiles: { username: string | null } } | null>(null);
     const [loading, setLoading] = useState(true);
     const [isFavorite, setIsFavorite] = useState(false);
     const [shareEmail, setShareEmail] = useState('');
@@ -22,14 +22,7 @@ const RecipeDetail = () => {
     const [showUserSelector, setShowUserSelector] = useState(false);
     const [sharedUsersVersion, setSharedUsersVersion] = useState(0);
 
-    useEffect(() => {
-        if (id) {
-            fetchRecipe();
-            if (user) checkFavorite();
-        }
-    }, [id, user]);
-
-    const fetchRecipe = async () => {
+    const fetchRecipe = useCallback(async () => {
         try {
             const { data, error } = await supabase
                 .from('rb_recipes')
@@ -45,18 +38,26 @@ const RecipeDetail = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [id, navigate]);
 
-    const checkFavorite = async () => {
+    const checkFavorite = useCallback(async () => {
+        if (!user) return;
         const { data } = await supabase
             .from('rb_favorites')
             .select('recipe_id')
             .eq('recipe_id', id)
-            .eq('user_id', user!.id)
+            .eq('user_id', user.id)
             .single();
 
         setIsFavorite(!!data);
-    };
+    }, [id, user]);
+
+    useEffect(() => {
+        if (id) {
+            fetchRecipe();
+            if (user) checkFavorite();
+        }
+    }, [id, user, fetchRecipe, checkFavorite]);
 
     const toggleFavorite = async () => {
         if (!user) return navigate('/login');
@@ -380,14 +381,21 @@ const RecipeDetail = () => {
 
 export default RecipeDetail;
 
+interface SharedUser {
+    id: string; // share id
+    user: {
+        email: string;
+        username: string | null;
+    };
+}
+
 const SharedUsersList = ({ recipeId }: { recipeId: string }) => {
-    const [sharedUsers, setSharedUsers] = useState<any[]>([]);
+    const [sharedUsers, setSharedUsers] = useState<SharedUser[]>([]);
     const [loading, setLoading] = useState(true);
 
     const [userToRemove, setUserToRemove] = useState<{ id: string, email: string } | null>(null);
 
-    const fetchSharedUsers = async () => {
-        setLoading(true);
+    const fetchSharedUsers = useCallback(async () => {
         // 1. Fetch shares
         const { data: shares, error: sharesError } = await supabase
             .from('rb_recipe_shares')
@@ -430,11 +438,12 @@ const SharedUsersList = ({ recipeId }: { recipeId: string }) => {
 
         setSharedUsers(combined);
         setLoading(false);
-    };
+    }, [recipeId]);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchSharedUsers();
-    }, [recipeId]);
+    }, [fetchSharedUsers]);
 
     const handleConfirmRemove = async () => {
         if (!userToRemove) return;

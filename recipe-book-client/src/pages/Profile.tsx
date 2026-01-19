@@ -62,9 +62,9 @@ const Profile = () => {
 
             await refreshProfile();
             setMessage({ type: 'success', text: 'Avatar updated successfully!' });
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Error uploading avatar:', error);
-            setMessage({ type: 'error', text: error.message || 'Error uploading avatar' });
+            setMessage({ type: 'error', text: (error as Error).message || 'Error uploading avatar' });
         } finally {
             setUploadingAvatar(false);
         }
@@ -105,8 +105,8 @@ const Profile = () => {
             await refreshProfile();
             setMessage({ type: 'success', text: 'Username updated successfully!' });
             setIsEditingUsername(false);
-        } catch (error: any) {
-            setMessage({ type: 'error', text: error.message });
+        } catch (error: unknown) {
+            setMessage({ type: 'error', text: (error as Error).message });
         } finally {
             setLoading(false);
         }
@@ -135,8 +135,8 @@ const Profile = () => {
             setMessage({ type: 'success', text: 'Password updated successfully!' });
             setNewPassword('');
             setConfirmPassword('');
-        } catch (error: any) {
-            setMessage({ type: 'error', text: error.message });
+        } catch (error: unknown) {
+            setMessage({ type: 'error', text: (error as Error).message });
         } finally {
             setLoading(false);
         }

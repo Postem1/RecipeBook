@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'; import { supabase } from '../lib/supabase';
+import { useEffect, useState, useCallback } from 'react'; import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import RecipeCard, { type Recipe } from '../components/recipes/RecipeCard';
 const Favorites = () => {
@@ -6,11 +6,9 @@ const Favorites = () => {
     const [recipes, setRecipes] = useState<Recipe[]>([]);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        if (user) fetchFavorites();
-    }, [user]);
 
-    const fetchFavorites = async () => {
+    const fetchFavorites = useCallback(async () => {
+        if (!user) return;
         try {
             setLoading(true);
             // Join with rb_favorites
@@ -23,12 +21,12 @@ const Favorites = () => {
             rb_profiles (username)
           )
         `)
-                .eq('user_id', user!.id);
+                .eq('user_id', user.id);
 
             if (error) throw error;
 
             // Extract recipes from the join
-            // @ts-ignore
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const favRecipes = data?.map((item: any) => item.rb_recipes as Recipe) || [];
             setRecipes(favRecipes);
         } catch (error) {
@@ -36,7 +34,11 @@ const Favorites = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [user]);
+
+    useEffect(() => {
+        if (user) fetchFavorites();
+    }, [user, fetchFavorites]);
 
     return (
         <div>
