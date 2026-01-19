@@ -63,7 +63,7 @@ const Home = () => {
                     left: 0,
                     right: 0,
                     height: '80vh',
-                    zIndex: 0,
+                    zIndex: -1,
                     backgroundImage: 'url("https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?auto=format&fit=crop&q=80&w=1920")',
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
