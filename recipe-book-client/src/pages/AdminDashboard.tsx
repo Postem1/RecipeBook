@@ -496,6 +496,7 @@ const AdminDashboard = () => {
                                 <tr style={{ borderBottom: '2px solid var(--color-border)' }}>
                                     <th style={{ textAlign: 'left', padding: '1rem' }}>Title</th>
                                     <th style={{ textAlign: 'left', padding: '1rem' }}>Owner ID</th>
+                                    <th style={{ textAlign: 'left', padding: '1rem' }}>Owner Username</th>
                                     <th style={{ textAlign: 'center', padding: '1rem' }}>Visibility</th>
                                     <th style={{ textAlign: 'right', padding: '1rem' }}>Actions</th>
                                 </tr>
@@ -509,6 +510,9 @@ const AdminDashboard = () => {
                                             </Link>
                                         </td>
                                         <td style={{ padding: '1rem', color: '#999', fontSize: '0.85rem' }}>{recipe.user_id.slice(0, 8)}...</td>
+                                        <td style={{ padding: '1rem', fontSize: '0.9rem' }}>
+                                            {profiles.find(p => p.id === recipe.user_id)?.username || profiles.find(p => p.id === recipe.user_id)?.email || 'Unknown'}
+                                        </td>
                                         <td style={{ padding: '1rem', textAlign: 'center' }}>
                                             <button
                                                 onClick={() => toggleRecipePrivacy(recipe.id, recipe.is_private)}

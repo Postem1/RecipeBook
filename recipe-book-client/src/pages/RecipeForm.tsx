@@ -126,9 +126,11 @@ const RecipeForm = () => {
             };
 
             if (id) {
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                const { user_id, ...updateData } = recipeData;
                 const { error } = await supabase
                     .from('rb_recipes')
-                    .update({ ...recipeData, updated_at: new Date() })
+                    .update({ ...updateData, updated_at: new Date() })
                     .eq('id', id);
                 if (error) throw error;
             } else {
