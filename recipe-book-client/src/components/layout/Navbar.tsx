@@ -86,7 +86,7 @@ const Navbar = () => {
 
                         {user ? (
                             <>
-                                {isAdmin && <Link to="/admin" style={{ ...linkStyle('/admin'), color: 'var(--color-primary)' }}>Admin</Link>}
+                                {isAdmin && <Link to="/admin" style={linkStyle('/admin')}>Admin</Link>}
                                 <Link to="/my-recipes" style={linkStyle('/my-recipes')}>My Recipes</Link>
                                 <Link to="/shared" style={linkStyle('/shared')}>Shared</Link>
                                 <Link to="/favorites" style={linkStyle('/favorites')}>Favorites</Link>
@@ -136,7 +136,7 @@ const Navbar = () => {
                         <Link to="/" onClick={() => setIsMobileMenuOpen(false)} style={linkStyle('/')}>Discover</Link>
                         {user ? (
                             <>
-                                {isAdmin && <Link to="/admin" onClick={() => setIsMobileMenuOpen(false)} style={{ ...linkStyle('/admin'), color: 'var(--color-primary)' }}>Admin Dashboard</Link>}
+                                {isAdmin && <Link to="/admin" onClick={() => setIsMobileMenuOpen(false)} style={linkStyle('/admin')}>Admin Dashboard</Link>}
                                 <Link to="/my-recipes" onClick={() => setIsMobileMenuOpen(false)} style={linkStyle('/my-recipes')}>My Recipes</Link>
                                 <Link to="/shared" onClick={() => setIsMobileMenuOpen(false)} style={linkStyle('/shared')}>Shared With Me</Link>
                                 <Link to="/favorites" onClick={() => setIsMobileMenuOpen(false)} style={linkStyle('/favorites')}>Favorites</Link>
