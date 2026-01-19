@@ -52,6 +52,7 @@ You can share your private recipes with friends who are also on the platform.
 3.  Enter the recipient's **Email Address**.
     -   *Note*: The email search is case-insensitive (e.g., `User@Example.com` works even if they registered as `user@example.com`).
 4.  If the user exists, the recipe will appear in their **"Shared With Me"** section.
+5.  **Manage Access**: The owner can see a list of users the recipe is shared with in the Share dialog and click the **Trash** icon to revoke access.
 
 ### Comments
 -   Scroll to the bottom of any recipe.

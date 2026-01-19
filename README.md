@@ -7,7 +7,7 @@ A modern, social Recipe Book application built with React, TypeScript, and Supab
 -   **User Authentication**: Secure Sign Up, Login, and Profile management including Avatar uploads.
 -   **Recipe Management**: Create, Read, Update, and Delete (CRUD) recipes with rich details (ingredients, instructions, photos).
 -   **Social Interaction**:
-    -   **Sharing**: Share private recipes with specific users via email.
+    -   **Sharing**: Share private recipes with specific users via email and manage access permissions.
     -   **Comments**: engage in discussions on recipe pages.
     -   **Favorites**: Bookmark your favorite recipes.
 -   **Admin Dashboard**:

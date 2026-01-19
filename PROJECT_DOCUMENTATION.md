@@ -28,7 +28,7 @@ The client application (`recipe-book-client`) provides a rich user interface for
     -   Upload recipe photos.
     -   Set privacy controls (Public/Private).
 -   **Social Features**:
-    -   **Sharing**: Share private recipes with other users via email (case-insensitive).
+    -   **Sharing**: Share private recipes with other users via email (case-insensitive). View list of users with access and revoke access.
     -   **Comments**: Discuss recipes with a built-in commenting system.
     -   **Favorites**: improved bookmarking of recipes.
 -   **Discovery**:

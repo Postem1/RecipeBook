@@ -20,6 +20,7 @@ const RecipeDetail = () => {
     const [isSharing, setIsSharing] = useState(false);
     const [shareMessage, setShareMessage] = useState<string | null>(null);
     const [showUserSelector, setShowUserSelector] = useState(false);
+    const [sharedUsersVersion, setSharedUsersVersion] = useState(0);
 
     useEffect(() => {
         if (id) {
@@ -120,6 +121,7 @@ const RecipeDetail = () => {
             } else {
                 setShareMessage('Recipe shared successfully!');
                 setShareEmail('');
+                setSharedUsersVersion(prev => prev + 1);
             }
         } finally {
             setIsSharing(false);
@@ -222,56 +224,66 @@ const RecipeDetail = () => {
                                         <button onClick={togglePrivacy} className="btn btn-outline" title={recipe.is_private ? 'Make Public' : 'Make Private'}>
                                             {recipe.is_private ? <Unlock size={20} /> : <Lock size={20} />}
                                         </button>
+                                    </>
+                                )}
 
-                                        <Dialog.Root>
-                                            <Dialog.Trigger asChild>
-                                                <button className="btn btn-outline" title="Share Recipe">
-                                                    <Share2 size={20} />
-                                                </button>
-                                            </Dialog.Trigger>
-                                            <Dialog.Portal>
-                                                <Dialog.Overlay style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)' }} />
-                                                <Dialog.Content style={{
-                                                    position: 'fixed',
-                                                    top: '50%',
-                                                    left: '50%',
-                                                    transform: 'translate(-50%, -50%)',
-                                                    backgroundColor: 'white',
-                                                    padding: '2rem',
-                                                    borderRadius: 'var(--radius-md)',
-                                                    boxShadow: 'var(--shadow-lg)',
-                                                    maxWidth: '400px',
-                                                    width: '90%'
-                                                }}>
-                                                    <Dialog.Title style={{ marginBottom: '1rem', fontSize: '1.25rem', fontWeight: 'bold' }}>Share Recipe</Dialog.Title>
-                                                    <Dialog.Description style={{ marginBottom: '1.5rem', color: 'var(--color-text-light)' }}>
-                                                        Share this private recipe with other users by email.
-                                                    </Dialog.Description>
+                                {(isOwner || isAdmin) && (
+                                    <Dialog.Root>
+                                        <Dialog.Trigger asChild>
+                                            <button className="btn btn-outline" title="Share Recipe">
+                                                <Share2 size={20} />
+                                            </button>
+                                        </Dialog.Trigger>
+                                        <Dialog.Portal>
+                                            <Dialog.Overlay style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)' }} />
+                                            <Dialog.Content style={{
+                                                position: 'fixed',
+                                                top: '50%',
+                                                left: '50%',
+                                                transform: 'translate(-50%, -50%)',
+                                                backgroundColor: 'white',
+                                                padding: '2rem',
+                                                borderRadius: 'var(--radius-md)',
+                                                boxShadow: 'var(--shadow-lg)',
+                                                maxWidth: '450px',
+                                                width: '90%',
+                                                maxHeight: '85vh',
+                                                overflowY: 'auto'
+                                            }}>
+                                                <Dialog.Title style={{ marginBottom: '1rem', fontSize: '1.25rem', fontWeight: 'bold' }}>Share Recipe</Dialog.Title>
+                                                <Dialog.Description style={{ marginBottom: '1.5rem', color: 'var(--color-text-light)' }}>
+                                                    Share this private recipe with other users by email.
+                                                </Dialog.Description>
 
-                                                    <form onSubmit={handleShare} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                                <form onSubmit={handleShare} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
+                                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
                                                         <input
                                                             type="email"
                                                             placeholder="User Email"
                                                             value={shareEmail}
                                                             onChange={e => setShareEmail(e.target.value)}
-                                                            style={{ padding: '0.5rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)' }}
+                                                            style={{ flex: 1, padding: '0.5rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)' }}
                                                             required
                                                         />
-                                                        {shareMessage && <p style={{ fontSize: '0.875rem', color: shareMessage.includes('success') ? 'green' : 'red' }}>{shareMessage}</p>}
-                                                        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-                                                            <Dialog.Close asChild>
-                                                                <button type="button" className="btn btn-outline">Close</button>
-                                                            </Dialog.Close>
-                                                            <button type="submit" className="btn btn-primary" disabled={isSharing}>
-                                                                {isSharing ? 'Sharing...' : 'Share'}
-                                                            </button>
-                                                        </div>
-                                                    </form>
-                                                </Dialog.Content>
-                                            </Dialog.Portal>
-                                        </Dialog.Root>
-                                    </>
+                                                        <button type="submit" className="btn btn-primary" disabled={isSharing}>
+                                                            {isSharing ? 'Sharing...' : 'Share'}
+                                                        </button>
+                                                    </div>
+                                                    {shareMessage && <p style={{ fontSize: '0.875rem', color: shareMessage.includes('success') ? 'green' : 'red' }}>{shareMessage}</p>}
+                                                </form>
+
+                                                <SharedUsersList key={sharedUsersVersion} recipeId={id!} />
+
+                                                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1rem' }}>
+                                                    <Dialog.Close asChild>
+                                                        <button type="button" className="btn btn-outline">Close</button>
+                                                    </Dialog.Close>
+                                                </div>
+                                            </Dialog.Content>
+                                        </Dialog.Portal>
+                                    </Dialog.Root>
                                 )}
+
                                 {canModify && (
                                     <>
                                         <Link to={`/edit-recipe/${recipe.id}`} className="btn btn-outline"><Edit size={20} /></Link>
@@ -367,3 +379,159 @@ const RecipeDetail = () => {
 };
 
 export default RecipeDetail;
+
+const SharedUsersList = ({ recipeId }: { recipeId: string }) => {
+    const [sharedUsers, setSharedUsers] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    const [userToRemove, setUserToRemove] = useState<{ id: string, email: string } | null>(null);
+
+    const fetchSharedUsers = async () => {
+        setLoading(true);
+        // 1. Fetch shares
+        const { data: shares, error: sharesError } = await supabase
+            .from('rb_recipe_shares')
+            .select('id, user_id')
+            .eq('recipe_id', recipeId);
+
+        if (sharesError) {
+            console.error('Error fetching shares:', sharesError);
+            setLoading(false);
+            return;
+        }
+
+        if (!shares || shares.length === 0) {
+            setSharedUsers([]);
+            setLoading(false);
+            return;
+        }
+
+        // 2. Fetch profiles for these users
+        const userIds = shares.map(s => s.user_id);
+        const { data: profiles, error: profilesError } = await supabase
+            .from('rb_profiles')
+            .select('id, email, username')
+            .in('id', userIds);
+
+        if (profilesError) {
+            console.error('Error fetching profiles:', profilesError);
+            setLoading(false);
+            return;
+        }
+
+        // 3. Merge data
+        const combined = shares.map(share => {
+            const profile = profiles?.find(p => p.id === share.user_id);
+            return {
+                id: share.id, // share id
+                user: profile || { email: 'Unknown', username: null }
+            };
+        });
+
+        setSharedUsers(combined);
+        setLoading(false);
+    };
+
+    useEffect(() => {
+        fetchSharedUsers();
+    }, [recipeId]);
+
+    const handleConfirmRemove = async () => {
+        if (!userToRemove) return;
+
+        const { error } = await supabase
+            .from('rb_recipe_shares')
+            .delete()
+            .eq('id', userToRemove.id);
+
+        if (error) {
+            alert('Failed to remove user.');
+            console.error(error);
+        } else {
+            setSharedUsers(prev => prev.filter(item => item.id !== userToRemove.id));
+        }
+        setUserToRemove(null);
+    };
+
+    if (loading) return <p>Loading shared users...</p>;
+
+    return (
+        <div>
+            {sharedUsers.length === 0 ? (
+                <p style={{ color: '#666', fontStyle: 'italic' }}>Not shared with anyone yet.</p>
+            ) : (
+                <>
+                    <h4 style={{ fontWeight: 'bold', marginBottom: '0.5rem' }}>Shared With:</h4>
+                    <ul style={{ listStyle: 'none', padding: 0, maxHeight: '200px', overflowY: 'auto' }}>
+                        {sharedUsers.map((share) => (
+                            <li key={share.id} style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                padding: '0.5rem',
+                                borderBottom: '1px solid #eee'
+                            }}>
+                                <span>
+                                    {share.user.username ? `@${share.user.username}` : share.user.email}
+                                    {share.user.username && <span style={{ color: '#888', fontSize: '0.8em', marginLeft: '0.5rem' }}>({share.user.email})</span>}
+                                </span>
+                                <button
+                                    type="button"
+                                    onClick={() => setUserToRemove({ id: share.id, email: share.user.email })}
+                                    style={{
+                                        background: 'none',
+                                        border: 'none',
+                                        color: 'var(--color-error)',
+                                        cursor: 'pointer',
+                                        padding: '0.25rem'
+                                    }}
+                                    title="Remove access"
+                                >
+                                    <Trash2 size={16} />
+                                </button>
+                            </li>
+                        ))}
+                    </ul>
+                </>
+            )}
+
+            <AlertDialog.Root open={!!userToRemove} onOpenChange={(open) => !open && setUserToRemove(null)}>
+                <AlertDialog.Portal>
+                    <AlertDialog.Overlay style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 200 }} />
+                    <AlertDialog.Content style={{
+                        position: 'fixed',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        backgroundColor: 'white',
+                        padding: '2rem',
+                        borderRadius: 'var(--radius-md)',
+                        boxShadow: 'var(--shadow-lg)',
+                        maxWidth: '400px',
+                        width: '90%',
+                        zIndex: 201
+                    }}>
+                        <AlertDialog.Title style={{ marginBottom: '1rem', fontSize: '1.25rem', fontWeight: 'bold' }}>Revoke Access</AlertDialog.Title>
+                        <AlertDialog.Description style={{ marginBottom: '1.5rem', color: 'var(--color-text-light)' }}>
+                            Are you sure you want to stop sharing this recipe with <strong>{userToRemove?.email}</strong>?
+                        </AlertDialog.Description>
+                        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+                            <AlertDialog.Cancel asChild>
+                                <button className="btn btn-outline">Cancel</button>
+                            </AlertDialog.Cancel>
+                            <AlertDialog.Action asChild>
+                                <button
+                                    onClick={handleConfirmRemove}
+                                    className="btn btn-primary"
+                                    style={{ backgroundColor: 'var(--color-error)', borderColor: 'var(--color-error)' }}
+                                >
+                                    Yes, Revoke
+                                </button>
+                            </AlertDialog.Action>
+                        </div>
+                    </AlertDialog.Content>
+                </AlertDialog.Portal>
+            </AlertDialog.Root>
+        </div>
+    );
+};
