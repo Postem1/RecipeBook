@@ -145,33 +145,7 @@ const AdminDashboard = () => {
         setAssignRecipeId(null);
     };
 
-    const runDataCleanup = async () => {
-        if (!confirm('This will update all recipes with missing titles, instructions, or ingredients. Continue?')) return;
 
-        try {
-            const { data: allRecipes, error: fetchError } = await supabase.from('rb_recipes').select('*');
-            if (fetchError) throw fetchError;
-
-            let updatedCount = 0;
-
-            for (const recipe of allRecipes || []) {
-                const updates: any = {};
-                if (!recipe.title || recipe.title.trim() === '') updates.title = 'Untitled Recipe';
-                if (!recipe.instructions || recipe.instructions.trim() === '') updates.instructions = 'No instructions provided.';
-                if (!recipe.ingredients || !Array.isArray(recipe.ingredients) || recipe.ingredients.length === 0) updates.ingredients = ['Water'];
-
-                if (Object.keys(updates).length > 0) {
-                    await supabase.from('rb_recipes').update(updates).eq('id', recipe.id);
-                    updatedCount++;
-                }
-            }
-            alert(`Cleanup complete. Updated ${updatedCount} recipes.`);
-            fetchData(); // Refresh data
-        } catch (error) {
-            console.error("Cleanup error:", error);
-            alert("Failed to cleanup data.");
-        }
-    };
 
     const handleToggleRole = (profile: Profile) => {
         setRoleChangeTarget({ id: profile.id, email: profile.email, currentRole: profile.role || 'user' });
