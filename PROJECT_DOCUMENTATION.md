@@ -5,8 +5,6 @@ This project is a modern, social Recipe Book application built with a React fron
 
 ## Architecture
 
-## Architecture
-
 ### The Antigravity Agent System
 This project utilizes the **Antigravity Kit** to drive AI-assisted development:
 
