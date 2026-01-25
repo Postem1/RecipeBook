@@ -83,6 +83,7 @@ const Home = () => {
                 <div style={{
                     position: 'relative',
                     zIndex: 10,
+                    width: '100%', // Ensure it doesn't exceed parent/viewport
                     maxWidth: '800px',
                     padding: '0 1rem',
                     animation: 'fadeInUp 0.8s ease-out forwards'
