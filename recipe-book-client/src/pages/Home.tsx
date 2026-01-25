@@ -86,7 +86,7 @@ const Home = () => {
                     animation: 'fadeInUp 0.8s ease-out forwards'
                 }}>
                     <h1 style={{
-                        fontSize: 'clamp(3rem, 6vw, 5rem)',
+                        fontSize: 'clamp(2.5rem, 6vw, 5rem)',
                         marginBottom: '1.5rem',
                         color: 'white',
                         textShadow: '0 4px 20px rgba(0,0,0,0.3)',
@@ -118,7 +118,7 @@ const Home = () => {
                             borderRadius: '50px',
                             boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
                             width: '450px',
-                            maxWidth: '100%',
+                            maxWidth: '90%',
                             backdropFilter: 'blur(10px)',
                             transform: 'translateY(0)',
                             transition: 'transform 0.3s ease'

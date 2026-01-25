@@ -380,7 +380,7 @@ const AdminDashboard = () => {
                                 flexDirection: 'column',
                                 gap: '1rem'
                             }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', flexWrap: 'wrap', gap: '0.5rem' }}>
                                     <div>
                                         <div style={{ fontWeight: '700', fontSize: '1.1rem', wordBreak: 'break-all' }}>{profile.email}</div>
                                         <div style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>{profile.username || 'No Username'}</div>

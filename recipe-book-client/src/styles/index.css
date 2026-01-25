@@ -262,6 +262,7 @@ textarea::placeholder {
   gap: 0.5rem;
   background-color: var(--color-bg-white);
   padding: 0.5rem;
+  padding-right: 1rem;
   border-radius: 50px;
   box-shadow: var(--shadow-sm);
   overflow-x: auto;
