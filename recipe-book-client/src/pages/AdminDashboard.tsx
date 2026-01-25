@@ -505,7 +505,7 @@ const AdminDashboard = () => {
                                 {filteredRecipes.map(recipe => (
                                     <tr key={recipe.id} style={{ borderBottom: '1px solid var(--color-border)' }}>
                                         <td style={{ padding: '1rem', fontWeight: '500' }}>
-                                            <Link to={`/edit-recipe/${recipe.id}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                                            <Link to={`/recipes/${recipe.id}`} style={{ color: 'inherit', textDecoration: 'none' }}>
                                                 {recipe.title}
                                             </Link>
                                         </td>
@@ -601,7 +601,7 @@ const AdminDashboard = () => {
                             }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
                                     <div style={{ flex: 1 }}>
-                                        <Link to={`/edit-recipe/${recipe.id}`} style={{ fontWeight: '700', fontSize: '1.1rem', textDecoration: 'none', color: 'inherit', display: 'block', marginBottom: '0.5rem' }}>
+                                        <Link to={`/recipes/${recipe.id}`} style={{ fontWeight: '700', fontSize: '1.1rem', textDecoration: 'none', color: 'inherit', display: 'block', marginBottom: '0.5rem' }}>
                                             {recipe.title}
                                         </Link>
                                         <button
