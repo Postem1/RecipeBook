@@ -22,6 +22,7 @@ const RecipeForm = () => {
     const [category, setCategory] = useState('Dinner');
     const [photoUrl, setPhotoUrl] = useState<string | null>(null);
     const [isPrivate, setIsPrivate] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const categories = ['Breakfast', 'Lunch', 'Dinner', 'Dessert', 'Snacks'];
 
@@ -108,20 +109,21 @@ const RecipeForm = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!user) return;
+        setError(null);
 
         try {
             // Validation
             if (!title.trim()) {
-                alert('Recipe title is required');
+                setError('Recipe title is required');
                 return;
             }
             if (!instructions.trim()) {
-                alert('Instructions are required');
+                setError('Instructions are required');
                 return;
             }
             const validIngredients = ingredients.filter(i => i.trim() !== '');
             if (validIngredients.length === 0) {
-                alert('At least one ingredient is required');
+                setError('At least one ingredient is required');
                 return;
             }
 
@@ -173,6 +175,12 @@ const RecipeForm = () => {
             </h1>
 
             <form onSubmit={handleSubmit} className="card" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+
+                {error && (
+                    <div style={{ padding: '1rem', backgroundColor: '#FFEBEE', color: '#D32F2F', borderRadius: 'var(--radius-md)', border: '1px solid #FFCDD2' }}>
+                        {error}
+                    </div>
+                )}
 
                 {/* Basic Info */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>

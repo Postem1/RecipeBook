@@ -6,6 +6,7 @@ RecipeBook is a modern, full-stack application for managing and sharing recipes.
 
 ### 🍳 Recipe Management
 *   **Create & Edit**: Rich text editing for ingredients and steps.
+*   **Validation**: Mandatory fields (Title, Instructions, Ingredients) ensure high-quality data.
 *   **Private vs Public**: Keep secret family recipes private or share them with the world.
 *   **Images**: Upload beautiful food photography (Supabase Storage).
 *   **Filtering**: Filter by meal type (Breakfast, Lunch, Dinner, Snack) or search by keyword.
