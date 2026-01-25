@@ -217,12 +217,7 @@ const AdminDashboard = () => {
     return (
         <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 1rem' }}>
             <div className="admin-header">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <h1 style={{ fontSize: '2.5rem', color: 'var(--color-text-primary)' }}>Superuser Dashboard</h1>
-                    <button onClick={runDataCleanup} className="btn btn-outline" style={{ fontSize: '0.8rem' }}>
-                        Run Data Cleanup
-                    </button>
-                </div>
+                <h1 style={{ fontSize: '2.5rem', color: 'var(--color-text-primary)' }}>Superuser Dashboard</h1>
                 <div className="admin-tabs">
                     {[
                         { id: 'overview', icon: LayoutDashboard, label: 'Overview' },
