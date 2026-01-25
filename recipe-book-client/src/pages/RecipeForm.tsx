@@ -110,6 +110,21 @@ const RecipeForm = () => {
         if (!user) return;
 
         try {
+            // Validation
+            if (!title.trim()) {
+                alert('Recipe title is required');
+                return;
+            }
+            if (!instructions.trim()) {
+                alert('Instructions are required');
+                return;
+            }
+            const validIngredients = ingredients.filter(i => i.trim() !== '');
+            if (validIngredients.length === 0) {
+                alert('At least one ingredient is required');
+                return;
+            }
+
             setLoading(true);
             const recipeData = {
                 title,
@@ -307,6 +322,7 @@ const RecipeForm = () => {
                         onChange={(e) => setInstructions(e.target.value)}
                         rows={8}
                         placeholder="Step-by-step instructions..."
+                        required
                         style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)' }}
                     />
                 </div>

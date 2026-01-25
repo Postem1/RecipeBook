@@ -145,6 +145,34 @@ const AdminDashboard = () => {
         setAssignRecipeId(null);
     };
 
+    const runDataCleanup = async () => {
+        if (!confirm('This will update all recipes with missing titles, instructions, or ingredients. Continue?')) return;
+
+        try {
+            const { data: allRecipes, error: fetchError } = await supabase.from('rb_recipes').select('*');
+            if (fetchError) throw fetchError;
+
+            let updatedCount = 0;
+
+            for (const recipe of allRecipes || []) {
+                const updates: any = {};
+                if (!recipe.title || recipe.title.trim() === '') updates.title = 'Untitled Recipe';
+                if (!recipe.instructions || recipe.instructions.trim() === '') updates.instructions = 'No instructions provided.';
+                if (!recipe.ingredients || !Array.isArray(recipe.ingredients) || recipe.ingredients.length === 0) updates.ingredients = ['Water'];
+
+                if (Object.keys(updates).length > 0) {
+                    await supabase.from('rb_recipes').update(updates).eq('id', recipe.id);
+                    updatedCount++;
+                }
+            }
+            alert(`Cleanup complete. Updated ${updatedCount} recipes.`);
+            fetchData(); // Refresh data
+        } catch (error) {
+            console.error("Cleanup error:", error);
+            alert("Failed to cleanup data.");
+        }
+    };
+
     const handleToggleRole = (profile: Profile) => {
         setRoleChangeTarget({ id: profile.id, email: profile.email, currentRole: profile.role || 'user' });
     };
@@ -189,7 +217,12 @@ const AdminDashboard = () => {
     return (
         <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 1rem' }}>
             <div className="admin-header">
-                <h1 style={{ fontSize: '2.5rem', color: 'var(--color-text-primary)' }}>Superuser Dashboard</h1>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <h1 style={{ fontSize: '2.5rem', color: 'var(--color-text-primary)' }}>Superuser Dashboard</h1>
+                    <button onClick={runDataCleanup} className="btn btn-outline" style={{ fontSize: '0.8rem' }}>
+                        Run Data Cleanup
+                    </button>
+                </div>
                 <div className="admin-tabs">
                     {[
                         { id: 'overview', icon: LayoutDashboard, label: 'Overview' },
