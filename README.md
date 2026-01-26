@@ -10,6 +10,7 @@ A modern, social Recipe Book application built with React, TypeScript, and Supab
     -   **Sharing**: Share private recipes with specific users via email and manage access permissions.
     -   **Comments**: engage in discussions on recipe pages.
     -   **Favorites**: Bookmark your favorite recipes.
+    -   **Video Support**: Upload and watch recipe videos directly within the application (MP4/WebM supported).
 -   **Admin Dashboard**:
     -   **Overview**: View system statistics (Total Users, Recipes, Active Sessions).
     -   **User Management**: Promote users to Admins or demote them.
