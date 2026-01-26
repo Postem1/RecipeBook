@@ -1,6 +1,10 @@
 import React from 'react';
 import ReactPlayer from 'react-player';
 
+// Workaround for type issues with ReactPlayer in some environments
+// @ts-ignore
+const ReactPlayerAny = ReactPlayer as any;
+
 interface VideoPlayerProps {
     url: string;
     style?: React.CSSProperties;
@@ -58,8 +62,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ url, style, autoPlay }) => {
                     style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'contain' }}
                 />
             ) : (
-                // @ts-ignore
-                <ReactPlayer
+                <ReactPlayerAny
                     url={url}
                     playing={autoPlay}
                     controls
