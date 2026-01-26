@@ -35,7 +35,8 @@ Once logged in, you can contribute to the community.
 2.  **Details**: Enter the Title, Description, Servings, Prep Time, and Cook Time.
 3.  **Ingredients**: Add ingredients one by one.
 4.  **Instructions**: Write satisfied step-by-step instructions.
-5.  **Privacy**: Toggle "Private" if you only want to share this recipe with specific people.
+5.  **Video**: Upload a video tutorial (MP4/WebM) to help others follow along.
+6.  **Privacy**: Toggle "Private" if you only want to share this recipe with specific people.
 
 ### Edit or Delete
 -   Navigate to a recipe you created.

@@ -2,7 +2,8 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
-import { Plus, X, Upload, Save, Loader } from 'lucide-react';
+import { Plus, X, Upload, Save, Loader, Video as VideoIcon } from 'lucide-react'; // Added VideoIcon
+
 
 const RecipeForm = () => {
     const { id } = useParams<{ id: string }>();
@@ -21,8 +22,13 @@ const RecipeForm = () => {
     const [servings, setServings] = useState<number | ''>('');
     const [category, setCategory] = useState('Dinner');
     const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+    const [videoUrl, setVideoUrl] = useState<string | null>(null);
+    const [videoInputType, setVideoInputType] = useState<'upload' | 'url'>('url');
+    const [uploadingVideo, setUploadingVideo] = useState(false);
     const [isPrivate, setIsPrivate] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+
 
     const categories = ['Breakfast', 'Lunch', 'Dinner', 'Dessert', 'Snacks'];
 
@@ -46,6 +52,12 @@ const RecipeForm = () => {
                 setServings(data.servings || '');
                 setCategory(data.category || 'Dinner');
                 setPhotoUrl(data.photo_url);
+                setVideoUrl(data.video_url || null);
+                if (data.video_url && !data.video_url.includes('youtube.com') && !data.video_url.includes('youtu.be')) {
+                    setVideoInputType('upload');
+                } else {
+                    setVideoInputType('url');
+                }
                 setIsPrivate(data.is_private || false);
             }
         } catch (error) {
@@ -106,6 +118,35 @@ const RecipeForm = () => {
         }
     };
 
+    const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (!e.target.files || e.target.files.length === 0) return;
+
+        try {
+            setUploadingVideo(true);
+            const file = e.target.files[0];
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Math.random()}.${fileExt}`;
+            const filePath = `${fileName}`;
+
+            const { error: uploadError } = await supabase.storage
+                .from('recipe-videos')
+                .upload(filePath, file);
+
+            if (uploadError) throw uploadError;
+
+            const { data } = supabase.storage
+                .from('recipe-videos')
+                .getPublicUrl(filePath);
+
+            setVideoUrl(data.publicUrl);
+        } catch (error: any) {
+            console.error('Error uploading video:', error);
+            setError(error.message || 'An error occurred while uploading video.');
+        } finally {
+            setUploadingVideo(false);
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!user) return;
@@ -138,6 +179,7 @@ const RecipeForm = () => {
                 servings: servings === '' ? null : Number(servings),
                 category,
                 photo_url: photoUrl,
+                video_url: videoUrl,
                 is_private: isPrivate,
                 user_id: user.id
             };
@@ -291,6 +333,88 @@ const RecipeForm = () => {
                     </div>
                 </div>
 
+                {/* Video Info */}
+                <div>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>Video</label>
+                    <div className="card" style={{ padding: '1.5rem', border: '1px solid var(--color-border)' }}>
+                        <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+                            <button
+                                type="button"
+                                className={`btn ${videoInputType === 'url' ? 'btn-primary' : 'btn-outline'}`}
+                                onClick={() => setVideoInputType('url')}
+                            >
+                                Video URL (YouTube)
+                            </button>
+                            <button
+                                type="button"
+                                className={`btn ${videoInputType === 'upload' ? 'btn-primary' : 'btn-outline'}`}
+                                onClick={() => setVideoInputType('upload')}
+                            >
+                                Upload Video
+                            </button>
+                        </div>
+
+                        {videoInputType === 'url' ? (
+                            <input
+                                type="text"
+                                placeholder="https://www.youtube.com/watch?v=..."
+                                value={videoUrl || ''}
+                                onChange={(e) => setVideoUrl(e.target.value)}
+                                style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)' }}
+                            />
+                        ) : (
+                            <label
+                                style={{
+                                    border: '2px dashed var(--color-border)',
+                                    borderRadius: 'var(--radius-md)',
+                                    padding: '2rem',
+                                    textAlign: 'center',
+                                    position: 'relative',
+                                    cursor: 'pointer',
+                                    backgroundColor: '#F8FAFC',
+                                    display: 'block'
+                                }}
+                            >
+                                {videoUrl && !videoUrl.includes('youtube.com') && !videoUrl.includes('youtu.be') ? (
+                                    <div style={{ position: 'relative' }} onClick={(e) => e.preventDefault()}>
+                                        <p style={{ marginBottom: '1rem', fontWeight: 'bold' }}>Video Uploaded</p>
+                                        <video src={videoUrl} controls style={{ maxWidth: '100%', maxHeight: '200px', borderRadius: 'var(--radius-md)' }} />
+                                        <button
+                                            type="button"
+                                            onClick={() => setVideoUrl(null)}
+                                            style={{ position: 'absolute', top: '-10px', right: '-10px', backgroundColor: 'var(--color-error)', color: 'white', borderRadius: '50%', padding: '4px' }}
+                                        >
+                                            <X size={16} />
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <>
+                                        {uploadingVideo ? (
+                                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+                                                <Loader className="animate-spin" />
+                                                <p>Uploading...</p>
+                                            </div>
+                                        ) : (
+                                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                                <VideoIcon size={48} color="var(--color-text-light)" style={{ marginBottom: '1rem' }} />
+                                                <p style={{ fontWeight: 600, color: 'var(--color-primary)' }}>Click to upload video</p>
+                                                <p style={{ fontSize: '0.875rem', color: 'var(--color-text-light)' }}>MP4, WebM, Ogg up to 50MB</p>
+                                            </div>
+                                        )}
+                                        <input
+                                            type="file"
+                                            accept="video/*"
+                                            onChange={handleVideoUpload}
+                                            style={{ display: 'none' }}
+                                        />
+                                    </>
+                                )}
+                            </label>
+                        )}
+                    </div>
+                </div>
+
+
                 {/* Ingredients */}
                 <div>
                     <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>Ingredients</label>
@@ -344,8 +468,8 @@ const RecipeForm = () => {
                     </button>
                 </div>
 
-            </form>
-        </div>
+            </form >
+        </div >
     );
 };
 

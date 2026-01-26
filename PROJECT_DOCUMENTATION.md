@@ -42,7 +42,7 @@ The client application (`recipe-book-client`) provides a rich user interface for
 -   **Authentication**: User Sign Up, Login, and Session Management via Supabase Auth.
 -   **Recipe Management**:
     -   Create, Edit, and Delete recipes.
-    -   Upload recipe photos.
+    -   **Media Support**: Upload, host, and view recipe videos and cover photos.
     -   Set privacy controls (Public/Private).
 -   **Social Features**:
     -   **Sharing**: Share private recipes with other users via email (case-insensitive). View list of users with access and revoke access.

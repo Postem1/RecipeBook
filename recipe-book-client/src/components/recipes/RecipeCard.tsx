@@ -11,6 +11,7 @@ export interface Recipe {
     cook_time: number | null;
     servings: number | null;
     category: string | null;
+    video_url?: string | null;
     is_private?: boolean;
     rb_profiles?: {
         username: string | null;

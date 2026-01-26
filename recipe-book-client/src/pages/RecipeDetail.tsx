@@ -1,19 +1,20 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { type Recipe } from '../components/recipes/RecipeCard';
 import { useAuth } from '../context/AuthContext';
-import { Clock, Users, Heart, Trash2, Edit, Share2, Lock, Unlock, UserCheck } from 'lucide-react';
+import { Clock, Users, Heart, Trash2, Edit, Share2, Lock, Unlock, UserCheck, Play, X } from 'lucide-react';
 import CommentSection from '../components/comments/CommentSection';
 import * as Dialog from '@radix-ui/react-dialog';
 import * as AlertDialog from '@radix-ui/react-alert-dialog';
 import UserSelector from '../components/admin/UserSelector';
+import VideoPlayer from '../components/recipes/VideoPlayer';
 
 const RecipeDetail = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const { user, isAdmin } = useAuth();
-    const [recipe, setRecipe] = useState<Recipe & { ingredients: string[], instructions: string, user_id: string, rb_profiles: { username: string | null } } | null>(null);
+    const [recipe, setRecipe] = useState<Recipe & { ingredients: string[], instructions: string, user_id: string, rb_profiles: { username: string | null }, video_url?: string | null } | null>(null);
     const [loading, setLoading] = useState(true);
     const [isFavorite, setIsFavorite] = useState(false);
     const [shareEmail, setShareEmail] = useState('');
@@ -21,6 +22,11 @@ const RecipeDetail = () => {
     const [shareMessage, setShareMessage] = useState<string | null>(null);
     const [showUserSelector, setShowUserSelector] = useState(false);
     const [sharedUsersVersion, setSharedUsersVersion] = useState(0);
+
+    // Video State
+    const [playingVideo, setPlayingVideo] = useState(false);
+    const [isSticky, setIsSticky] = useState(false);
+    const heroRef = useRef<HTMLDivElement>(null);
 
     const fetchRecipe = useCallback(async () => {
         try {
@@ -58,6 +64,34 @@ const RecipeDetail = () => {
             if (user) checkFavorite();
         }
     }, [id, user, fetchRecipe, checkFavorite]);
+
+    // Sticky Video Logic
+    useEffect(() => {
+        if (!playingVideo) {
+            setIsSticky(false);
+            return;
+        }
+
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                // If hero is NOT intersecting (scrolled out of view), set sticky to true
+                setIsSticky(!entry.isIntersecting);
+            },
+            {
+                threshold: 0,
+                rootMargin: '-100px 0px 0px 0px' // Trigger slightly before it's completely gone
+            }
+        );
+
+        if (heroRef.current) {
+            observer.observe(heroRef.current);
+        }
+
+        return () => {
+            observer.disconnect();
+        };
+    }, [playingVideo]);
+
 
     const toggleFavorite = async () => {
         if (!user) return navigate('/login');
@@ -166,50 +200,138 @@ const RecipeDetail = () => {
     const isOwner = user?.id === recipe.user_id;
     const canModify = isOwner || isAdmin;
     const ingredientsList = Array.isArray(recipe.ingredients) ? recipe.ingredients : [];
+    const hasVideo = !!recipe.video_url;
 
     return (
         <div>
-            <div style={{ position: 'relative', height: '400px', borderRadius: 'var(--radius-lg)', overflow: 'hidden', marginBottom: '2rem' }}>
-                {recipe.photo_url ? (
-                    <img src={recipe.photo_url} alt={recipe.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            {/* Hero Section */}
+            <div
+                ref={heroRef}
+                style={{ position: 'relative', height: '400px', borderRadius: 'var(--radius-lg)', overflow: 'hidden', marginBottom: '2rem', backgroundColor: '#000' }}
+            >
+                {/* 
+                    Logic:
+                    Show Video Player IF:
+                    1. hasVideo is true
+                    2. playingVideo is true
+                    3. isSticky is false (if it's sticky, we show the placeholder image here again so it's not empty)
+                */}
+                {hasVideo && playingVideo && !isSticky ? (
+                    <VideoPlayer url={recipe.video_url!} style={{ width: '100%', height: '100%' }} autoPlay={true} />
                 ) : (
-                    <div style={{ width: '100%', height: '100%', backgroundColor: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '5rem' }}>🍳</div>
-                )}
-                <div style={{
-                    position: 'absolute',
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    background: 'linear-gradient(transparent, rgba(0,0,0,0.7))',
-                    padding: '2rem',
-                    color: 'white'
-                }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-                        <div>
-                            <h1 style={{ fontSize: '3rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                {recipe.title}
-                                {recipe.is_private && <div title="Private Recipe"><Lock size={32} /></div>}
-                            </h1>
-                            <div style={{ display: 'flex', gap: '2rem' }}>
-                                <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Clock /> {(recipe.prep_time || 0) + (recipe.cook_time || 0)}m</span>
-                                <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Users /> {recipe.servings} servings</span>
+                    <>
+                        {recipe.photo_url ? (
+                            <img src={recipe.photo_url} alt={recipe.title} style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: hasVideo && !playingVideo ? 0.9 : 1 }} />
+                        ) : (
+                            <div style={{ width: '100%', height: '100%', backgroundColor: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '5rem' }}>🍳</div>
+                        )}
+
+                        {/* Play Button Overlay */}
+                        {hasVideo && (
+                            <button
+                                onClick={() => setPlayingVideo(true)}
+                                style={{
+                                    position: 'absolute',
+                                    bottom: '2rem',
+                                    right: '2rem',
+                                    backgroundColor: 'white',
+                                    color: 'black',
+                                    border: 'none',
+                                    borderRadius: '50px',
+                                    padding: '0.75rem 1.5rem',
+                                    fontSize: '1rem',
+                                    fontWeight: 'bold',
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '0.5rem',
+                                    zIndex: 10,
+                                    boxShadow: '0 4px 6px rgba(0,0,0,0.3)',
+                                    transition: 'transform 0.2s'
+                                }}
+                                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                            >
+                                <Play fill="black" size={20} /> Watch Video
+                            </button>
+                        )}
+
+                        <div style={{
+                            position: 'absolute',
+                            bottom: 0,
+                            left: 0,
+                            right: 0,
+                            background: 'linear-gradient(transparent, rgba(0,0,0,0.7))',
+                            padding: '2rem',
+                            color: 'white',
+                            pointerEvents: 'none' // Let clicks pass through to play button if needed, but play button is z-index high
+                        }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                                <div>
+                                    <h1 style={{ fontSize: '3rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                        {recipe.title}
+                                        {recipe.is_private && <div title="Private Recipe"><Lock size={32} /></div>}
+                                    </h1>
+                                    <div style={{ display: 'flex', gap: '2rem' }}>
+                                        <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Clock /> {(recipe.prep_time || 0) + (recipe.cook_time || 0)}m</span>
+                                        <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Users /> {recipe.servings} servings</span>
+                                    </div>
+                                </div>
+                                {recipe.rb_profiles?.username && (
+                                    <div style={{
+                                        fontSize: '1.2rem',
+                                        fontWeight: '600',
+                                        textShadow: '0 2px 4px rgba(0,0,0,0.6)',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '0.5rem'
+                                    }}>
+                                        @{recipe.rb_profiles.username}
+                                    </div>
+                                )}
                             </div>
                         </div>
-                        {recipe.rb_profiles?.username && (
-                            <div style={{
-                                fontSize: '1.2rem',
-                                fontWeight: '600',
-                                textShadow: '0 2px 4px rgba(0,0,0,0.6)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '0.5rem'
-                            }}>
-                                @{recipe.rb_profiles.username}
-                            </div>
-                        )}
-                    </div>
-                </div>
+                    </>
+                )}
             </div>
+
+            {/* Sticky Player */}
+            {hasVideo && playingVideo && isSticky && (
+                <div style={{
+                    position: 'fixed',
+                    bottom: '2rem',
+                    right: '2rem',
+                    width: '320px',
+                    aspectRatio: '16/9',
+                    borderRadius: 'var(--radius-md)',
+                    overflow: 'hidden',
+                    boxShadow: '0 10px 25px rgba(0,0,0,0.5)',
+                    zIndex: 1000,
+                    animation: 'slideIn 0.3s ease-out'
+                }}>
+                    {/* Add a close button for the sticky player if desired, or play/pause controls are usually inside the video */}
+                    <div style={{ position: 'absolute', top: '0.5rem', right: '0.5rem', zIndex: 1001 }}>
+                        <button
+                            onClick={() => {
+                                setPlayingVideo(false);
+                                setIsSticky(false);
+                            }}
+                            style={{
+                                background: 'rgba(0,0,0,0.5)',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '50%',
+                                padding: '4px',
+                                cursor: 'pointer'
+                            }}
+                        >
+                            <X size={16} />
+                        </button>
+                    </div>
+                    <VideoPlayer url={recipe.video_url!} style={{ width: '100%', height: '100%' }} autoPlay={true} />
+                </div>
+            )}
+
 
             <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
                 <div style={{ flex: 2, minWidth: '300px' }}>
@@ -375,6 +497,13 @@ const RecipeDetail = () => {
                 onSelect={handleReassign}
                 title="Reassign Recipe"
             />
+            {/* Animation style */}
+            <style>{`
+                @keyframes slideIn {
+                    from { transform: translateY(20px); opacity: 0; }
+                    to { transform: translateY(0); opacity: 1; }
+                }
+            `}</style>
         </div>
     );
 };
@@ -544,3 +673,4 @@ const SharedUsersList = ({ recipeId }: { recipeId: string }) => {
         </div>
     );
 };
+
