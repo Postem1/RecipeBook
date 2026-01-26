@@ -216,9 +216,13 @@ const RecipeDetail = () => {
                     2. playingVideo is true
                     3. isSticky is false (if it's sticky, we show the placeholder image here again so it's not empty)
                 */}
-                {hasVideo && playingVideo && !isSticky ? (
-                    <VideoPlayer url={recipe.video_url!} style={{ width: '100%', height: '100%' }} autoPlay={true} />
-                ) : (
+                {/* 
+                    Placeholder Logic:
+                    Show placeholder if:
+                    1. Video is NOT playing
+                    2. OR Video IS playing but is currently sticky (popped out), so we leave the background image here
+                */}
+                {(!playingVideo || isSticky) && (
                     <>
                         {recipe.photo_url ? (
                             <img src={recipe.photo_url} alt={recipe.title} style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: hasVideo && !playingVideo ? 0.9 : 1 }} />
@@ -226,8 +230,8 @@ const RecipeDetail = () => {
                             <div style={{ width: '100%', height: '100%', backgroundColor: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '5rem' }}>🍳</div>
                         )}
 
-                        {/* Play Button Overlay */}
-                        {hasVideo && (
+                        {/* Play Button Overlay - Only show if video exists and is not currently playing */}
+                        {hasVideo && !playingVideo && (
                             <button
                                 onClick={() => setPlayingVideo(true)}
                                 style={{
@@ -264,7 +268,7 @@ const RecipeDetail = () => {
                             background: 'linear-gradient(transparent, rgba(0,0,0,0.7))',
                             padding: '2rem',
                             color: 'white',
-                            pointerEvents: 'none' // Let clicks pass through to play button if needed, but play button is z-index high
+                            pointerEvents: 'none' // Let clicks pass through to play button if needed
                         }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                                 <div>
@@ -293,44 +297,62 @@ const RecipeDetail = () => {
                         </div>
                     </>
                 )}
+
+                {/* 
+                    Unified Video Player:
+                    Rendered ONCE here. We change its styling to move it from "inside hero" to "fixed sticky".
+                */}
+                {hasVideo && playingVideo && (
+                    <div style={isSticky ? {
+                        position: 'fixed',
+                        bottom: '2rem',
+                        right: '2rem',
+                        width: '320px',
+                        aspectRatio: '16/9',
+                        borderRadius: 'var(--radius-md)',
+                        overflow: 'hidden',
+                        boxShadow: '0 10px 25px rgba(0,0,0,0.5)',
+                        zIndex: 1000,
+                        backgroundColor: '#000',
+                        animation: 'slideIn 0.3s ease-out'
+                    } : {
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                        zIndex: 20 // Above placeholder
+                    }}>
+                        {/* Close Button - Only for Sticky Mode */}
+                        {isSticky && (
+                            <div style={{ position: 'absolute', top: '0.5rem', right: '0.5rem', zIndex: 1001 }}>
+                                <button
+                                    onClick={() => {
+                                        setPlayingVideo(false);
+                                        setIsSticky(false);
+                                    }}
+                                    style={{
+                                        background: 'rgba(0,0,0,0.5)',
+                                        color: 'white',
+                                        border: 'none',
+                                        borderRadius: '50%',
+                                        padding: '4px',
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center'
+                                    }}
+                                >
+                                    <X size={16} />
+                                </button>
+                            </div>
+                        )}
+                        <VideoPlayer url={recipe.video_url!} style={{ width: '100%', height: '100%' }} autoPlay={true} />
+                    </div>
+                )}
             </div>
 
-            {/* Sticky Player */}
-            {hasVideo && playingVideo && isSticky && (
-                <div style={{
-                    position: 'fixed',
-                    bottom: '2rem',
-                    right: '2rem',
-                    width: '320px',
-                    aspectRatio: '16/9',
-                    borderRadius: 'var(--radius-md)',
-                    overflow: 'hidden',
-                    boxShadow: '0 10px 25px rgba(0,0,0,0.5)',
-                    zIndex: 1000,
-                    animation: 'slideIn 0.3s ease-out'
-                }}>
-                    {/* Add a close button for the sticky player if desired, or play/pause controls are usually inside the video */}
-                    <div style={{ position: 'absolute', top: '0.5rem', right: '0.5rem', zIndex: 1001 }}>
-                        <button
-                            onClick={() => {
-                                setPlayingVideo(false);
-                                setIsSticky(false);
-                            }}
-                            style={{
-                                background: 'rgba(0,0,0,0.5)',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '50%',
-                                padding: '4px',
-                                cursor: 'pointer'
-                            }}
-                        >
-                            <X size={16} />
-                        </button>
-                    </div>
-                    <VideoPlayer url={recipe.video_url!} style={{ width: '100%', height: '100%' }} autoPlay={true} />
-                </div>
-            )}
+
 
 
             <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
