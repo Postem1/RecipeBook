@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useLayoutEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import RecipeCard, { type Recipe } from '../components/recipes/RecipeCard';
 import Pagination from '../components/common/Pagination';
@@ -16,40 +16,70 @@ const Home = () => {
     const categories = ['All', 'Breakfast', 'Lunch', 'Dinner', 'Dessert', 'Snacks'];
 
     const recipesSectionRef = useRef<HTMLDivElement>(null);
+    // Explicit opt-in for scrolling: only true when user interacts
+    const shouldScroll = useRef(false);
 
     // Debounce search term to prevent rapid API calls
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
 
     useEffect(() => {
         const handler = setTimeout(() => {
-            setDebouncedSearchTerm(searchTerm);
-            setCurrentPage(1); // Reset to page 1 on search change
+            if (searchTerm !== debouncedSearchTerm) {
+                shouldScroll.current = true; // User initiated search
+                setDebouncedSearchTerm(searchTerm);
+                setCurrentPage(1); // Reset to page 1 on search change
+            }
         }, 500);
 
         return () => clearTimeout(handler);
-    }, [searchTerm]);
+    }, [searchTerm, debouncedSearchTerm]);
 
-    // Initial load
-    useEffect(() => {
+    // Initial load effect to scroll to top and fetch recipes
+    // using useLayoutEffect to ensure scroll happens before paint
+    useLayoutEffect(() => {
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+        window.scrollTo(0, 0);
         fetchRecipes();
+        return () => {
+            if ('scrollRestoration' in history) {
+                history.scrollRestoration = 'auto';
+            }
+        };
     }, []);
 
-    // Fetch on changes
+    // Fetch on changes to currentPage, debouncedSearchTerm, selectedCategory
     useEffect(() => {
         fetchRecipes();
-        // Scroll to top of recipes section when page changes, but maybe not on initial load/filter change if we want to be subtle?
-        // User asked: "Instead of scrolling all the way to the top ... go to the first visible row"
+    }, [currentPage, debouncedSearchTerm, selectedCategory]);
+
+    // Scroll handling for content updates
+    useLayoutEffect(() => {
+        if (shouldScroll.current) {
+            scrollToRecipes();
+            shouldScroll.current = false; // Reset after scrolling
+        }
+    }, [currentPage, debouncedSearchTerm, selectedCategory]);
+
+    const scrollToRecipes = () => {
         if (recipesSectionRef.current) {
             const yOffset = -100; // Offset for sticky headers if any, or just breathing room
             const element = recipesSectionRef.current;
             const y = element.getBoundingClientRect().top + window.scrollY + yOffset;
             window.scrollTo({ top: y, behavior: 'smooth' });
         }
-    }, [currentPage, debouncedSearchTerm, selectedCategory]);
+    };
 
     const handleCategoryChange = (category: string) => {
+        shouldScroll.current = true; // User initiated category change
         setSelectedCategory(category);
         setCurrentPage(1); // Reset to page 1 on category change
+    };
+
+    const handlePageChange = (page: number) => {
+        shouldScroll.current = true; // User initiated page change
+        setCurrentPage(page);
     };
 
     const fetchRecipes = async () => {
@@ -261,7 +291,7 @@ const Home = () => {
                         <Pagination
                             currentPage={currentPage}
                             totalPages={totalPages}
-                            onPageChange={setCurrentPage}
+                            onPageChange={handlePageChange}
                         />
                     </>
                 ) : (
