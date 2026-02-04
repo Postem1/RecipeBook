@@ -1,5 +1,7 @@
-import { useEffect, useState, useCallback } from 'react'; import { supabase } from '../lib/supabase';
-import RecipeCard, { type Recipe } from '../components/recipes/RecipeCard'; import { useAuth } from '../context/AuthContext';
+import { useState, useCallback, useRef, useLayoutEffect } from 'react';
+import { supabase } from '../lib/supabase';
+import RecipeCard, { type Recipe } from '../components/recipes/RecipeCard';
+import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 import Pagination from '../components/common/Pagination';
 import { Plus } from 'lucide-react';
@@ -12,6 +14,8 @@ const MyRecipes = () => {
     const [totalCount, setTotalCount] = useState(0);
 
     const ITEMS_PER_PAGE = 10;
+    const recipesSectionRef = useRef<HTMLDivElement>(null);
+    const shouldScroll = useRef(false);
 
     const fetchMyRecipes = useCallback(async () => {
         if (!user) return;
@@ -37,12 +41,37 @@ const MyRecipes = () => {
         }
     }, [user, currentPage]);
 
-    useEffect(() => {
+    // Initial load effect
+    useLayoutEffect(() => {
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+        window.scrollTo(0, 0);
+
         if (user) {
-            window.scrollTo(0, 0);
             fetchMyRecipes();
         }
+
+        return () => {
+            if ('scrollRestoration' in history) {
+                history.scrollRestoration = 'auto';
+            }
+        };
     }, [user, fetchMyRecipes]);
+
+    // Scroll handling
+    useLayoutEffect(() => {
+        if (shouldScroll.current) {
+            if (recipesSectionRef.current) {
+                const yOffset = -100;
+                const element = recipesSectionRef.current;
+                const y = element.getBoundingClientRect().top + window.scrollY + yOffset;
+                window.scrollTo({ top: y, behavior: 'smooth' });
+            }
+            shouldScroll.current = false;
+        }
+    }, [currentPage]);
+
 
     const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
@@ -59,7 +88,7 @@ const MyRecipes = () => {
             {loading ? (
                 <div style={{ textAlign: 'center', padding: '3rem' }}>Loading...</div>
             ) : recipes.length > 0 ? (
-                <>
+                <div ref={recipesSectionRef}>
                     <div style={{
                         display: 'grid',
                         gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
@@ -72,9 +101,12 @@ const MyRecipes = () => {
                     <Pagination
                         currentPage={currentPage}
                         totalPages={totalPages}
-                        onPageChange={setCurrentPage}
+                        onPageChange={(page) => {
+                            shouldScroll.current = true;
+                            setCurrentPage(page);
+                        }}
                     />
-                </>
+                </div>
             ) : (
                 <div style={{ textAlign: 'center', padding: '3rem', backgroundColor: 'white', borderRadius: 'var(--radius-lg)' }}>
                     <p style={{ marginBottom: '1rem', color: 'var(--color-text-light)' }}>You haven't created any recipes yet.</p>

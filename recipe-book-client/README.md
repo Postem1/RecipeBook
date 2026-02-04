@@ -22,6 +22,10 @@ RecipeBook is a modern, full-stack application for managing and sharing recipes.
 *   **Stats**: Quick view of total users and recipes.
 *   **Mobile Optimized**: Fully responsive card-based layout for mobile admin tasks.
 
+### ✨ UX Enhancements
+*   **Smart Pagination**: Server-side pagination (10 items/page) for fast loading on Home, My Recipes, Shared, and Favorites.
+*   **Contextual Scrolling**: Intelligent scroll management ensures you start at the top on load, but maintain context (scroll to list top) when navigating pages.
+
 ## Tech Stack
 
 *   **Frontend**: React (Vite), TypeScript
