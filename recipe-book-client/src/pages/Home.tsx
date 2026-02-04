@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import RecipeCard, { type Recipe } from '../components/recipes/RecipeCard';
+import Pagination from '../components/common/Pagination';
 import { Search } from 'lucide-react';
 
 const Home = () => {
@@ -8,24 +9,80 @@ const Home = () => {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState<string>('All');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalCount, setTotalCount] = useState(0);
 
+    const ITEMS_PER_PAGE = 10;
     const categories = ['All', 'Breakfast', 'Lunch', 'Dinner', 'Dessert', 'Snacks'];
 
+    const recipesSectionRef = useRef<HTMLDivElement>(null);
+
+    // Debounce search term to prevent rapid API calls
+    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedSearchTerm(searchTerm);
+            setCurrentPage(1); // Reset to page 1 on search change
+        }, 500);
+
+        return () => clearTimeout(handler);
+    }, [searchTerm]);
+
+    // Initial load
     useEffect(() => {
         fetchRecipes();
     }, []);
 
+    // Fetch on changes
+    useEffect(() => {
+        fetchRecipes();
+        // Scroll to top of recipes section when page changes, but maybe not on initial load/filter change if we want to be subtle?
+        // User asked: "Instead of scrolling all the way to the top ... go to the first visible row"
+        if (recipesSectionRef.current) {
+            const yOffset = -100; // Offset for sticky headers if any, or just breathing room
+            const element = recipesSectionRef.current;
+            const y = element.getBoundingClientRect().top + window.scrollY + yOffset;
+            window.scrollTo({ top: y, behavior: 'smooth' });
+        }
+    }, [currentPage, debouncedSearchTerm, selectedCategory]);
+
+    const handleCategoryChange = (category: string) => {
+        setSelectedCategory(category);
+        setCurrentPage(1); // Reset to page 1 on category change
+    };
+
     const fetchRecipes = async () => {
         try {
             setLoading(true);
-            const { data, error } = await supabase
+            let query = supabase
                 .from('rb_recipes')
-                .select('*, rb_profiles(username)')
+                .select('*, rb_profiles(username)', { count: 'exact' })
                 .eq('is_private', false)
                 .order('created_at', { ascending: false });
 
+            // Apply Search Filter (Server-side)
+            if (debouncedSearchTerm) {
+                // Using .or to search in title OR description
+                // Note: This requires the columns to be text type, which they likely are.
+                query = query.or(`title.ilike.%${debouncedSearchTerm}%,description.ilike.%${debouncedSearchTerm}%`);
+            }
+
+            // Apply Category Filter (Server-side)
+            if (selectedCategory !== 'All') {
+                query = query.eq('category', selectedCategory);
+            }
+
+            // Apply Pagination
+            const from = (currentPage - 1) * ITEMS_PER_PAGE;
+            const to = from + ITEMS_PER_PAGE - 1;
+            query = query.range(from, to);
+
+            const { data, count, error } = await query;
+
             if (error) throw error;
             setRecipes(data || []);
+            setTotalCount(count || 0);
         } catch (error) {
             console.error('Error fetching recipes:', error);
         } finally {
@@ -33,12 +90,7 @@ const Home = () => {
         }
     };
 
-    const filteredRecipes = recipes.filter(recipe => {
-        const matchesSearch = recipe.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (recipe.description && recipe.description.toLowerCase().includes(searchTerm.toLowerCase()));
-        const matchesCategory = selectedCategory === 'All' || recipe.category === selectedCategory;
-        return matchesSearch && matchesCategory;
-    });
+    const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
     return (
         <div>
@@ -69,7 +121,7 @@ const Home = () => {
                     backgroundImage: 'url("https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?auto=format&fit=crop&q=80&w=1920")',
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
-                    transform: `translateY(${scrollY * 0.5}px)`,
+                    transform: `translateY(${window.scrollY * 0.5}px)`,
                 }}>
                     <div style={{
                         position: 'absolute',
@@ -159,7 +211,7 @@ const Home = () => {
                         {categories.slice(0, 4).map((cat, i) => (
                             <button
                                 key={cat}
-                                onClick={() => setSelectedCategory(cat)}
+                                onClick={() => handleCategoryChange(cat)}
                                 className={`delay-${(i + 1) * 100}`}
                                 style={{
                                     padding: '0.5rem 1.25rem',
@@ -184,7 +236,7 @@ const Home = () => {
             </section>
 
             {/* Content Grid */}
-            <div style={{ paddingBottom: '6rem' }}>
+            <div style={{ paddingBottom: '6rem' }} ref={recipesSectionRef}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '3rem' }}>
                     <h2 style={{ fontSize: '2rem', letterSpacing: '-0.02em' }}>
                         {selectedCategory === 'All' ? 'Latest Recipes' : `${selectedCategory} Recipes`}
@@ -195,16 +247,23 @@ const Home = () => {
                     <div style={{ textAlign: 'center', padding: '4rem' }}>
                         <div style={{ fontSize: '1.5rem', color: 'var(--color-text-secondary)', fontWeight: '500' }}>Loading deliciousness...</div>
                     </div>
-                ) : filteredRecipes.length > 0 ? (
-                    <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-                        gap: '3rem'
-                    }}>
-                        {filteredRecipes.map(recipe => (
-                            <RecipeCard key={recipe.id} recipe={recipe} />
-                        ))}
-                    </div>
+                ) : recipes.length > 0 ? (
+                    <>
+                        <div style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+                            gap: '3rem'
+                        }}>
+                            {recipes.map(recipe => (
+                                <RecipeCard key={recipe.id} recipe={recipe} />
+                            ))}
+                        </div>
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={setCurrentPage}
+                        />
+                    </>
                 ) : (
                     <div style={{
                         textAlign: 'center',
