@@ -8,7 +8,7 @@ interface Comment {
     content: string;
     user_id: string;
     created_at: string;
-    user_email?: string; // We'll try to fetch this
+    username?: string | null; // Author username, resolved from rb_profiles
 }
 
 interface CommentSectionProps {
@@ -35,15 +35,21 @@ const CommentSection: React.FC<CommentSectionProps> = ({ recipeId, recipeOwnerId
             return;
         }
 
-        // 2. Fetch user emails from rb_profiles (if we had them synced) or just display ID for now
-        // Since we don't have a reliable name source without joining auth.users (which we can't do from client easily), 
-        // we will rely on what we have. 
-        // Actually, let's try to fetch emails from rb_profiles if we populated it.
-        // If rb_profiles is empty, we might need to rely on the current session for the current user, 
-        // but for others we can't see valid names.
+        const rows = commentsData || [];
 
-        // Simplification: Just show comments.
-        setComments(commentsData || []);
+        // 2. Resolve author usernames in a single batched query (no FK relationship
+        // is defined between rb_comments and rb_profiles, so we join in code).
+        const userIds = [...new Set(rows.map((c) => c.user_id))];
+        let usernameById: Record<string, string | null> = {};
+        if (userIds.length > 0) {
+            const { data: profiles } = await supabase
+                .from('rb_profiles')
+                .select('id, username')
+                .in('id', userIds);
+            usernameById = Object.fromEntries((profiles || []).map((p) => [p.id, p.username]));
+        }
+
+        setComments(rows.map((c) => ({ ...c, username: usernameById[c.user_id] ?? null })));
     }, [recipeId]);
 
     useEffect(() => {
@@ -81,7 +87,10 @@ const CommentSection: React.FC<CommentSectionProps> = ({ recipeId, recipeOwnerId
             .delete()
             .eq('id', commentId);
 
-        if (!error) {
+        if (error) {
+            console.error('Error deleting comment:', error);
+            alert('Failed to delete comment.');
+        } else {
             fetchComments();
         }
     };
@@ -117,7 +126,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ recipeId, recipeOwnerId
                         <div key={comment.id} style={{ padding: '1rem', backgroundColor: '#f9f9f9', borderRadius: 'var(--radius-md)' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
                                 <span style={{ fontWeight: '600', fontSize: '0.875rem' }}>
-                                    {isOwner ? 'You' : 'User'}
+                                    {isOwner ? 'You' : (comment.username ? `@${comment.username}` : 'User')}
                                     <span style={{ fontWeight: 'normal', color: '#999', marginLeft: '0.5rem' }}>
                                         {new Date(comment.created_at).toLocaleDateString()}
                                     </span>

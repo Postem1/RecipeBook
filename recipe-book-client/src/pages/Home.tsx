@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase';
 import RecipeCard, { type Recipe } from '../components/recipes/RecipeCard';
 import Pagination from '../components/common/Pagination';
 import { Search } from 'lucide-react';
+import { ITEMS_PER_PAGE, CATEGORIES, RECIPE_CARD_COLUMNS } from '../lib/constants';
 
 const Home = () => {
     const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -12,12 +13,13 @@ const Home = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalCount, setTotalCount] = useState(0);
 
-    const ITEMS_PER_PAGE = 10;
-    const categories = ['All', 'Breakfast', 'Lunch', 'Dinner', 'Dessert', 'Snacks'];
+    const categories = ['All', ...CATEGORIES];
 
     const recipesSectionRef = useRef<HTMLDivElement>(null);
     // Explicit opt-in for scrolling: only true when user interacts
     const shouldScroll = useRef(false);
+    // Monotonic request id so a slow earlier fetch can't overwrite a newer one.
+    const latestRequest = useRef(0);
 
     // Debounce search term to prevent rapid API calls
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
@@ -41,7 +43,9 @@ const Home = () => {
             history.scrollRestoration = 'manual';
         }
         window.scrollTo(0, 0);
-        fetchRecipes();
+        // The initial fetch is handled by the [currentPage, debouncedSearchTerm,
+        // selectedCategory] effect below (which also runs on mount), so we don't
+        // fetch here — doing both caused a duplicate request on first load.
         return () => {
             if ('scrollRestoration' in history) {
                 history.scrollRestoration = 'auto';
@@ -49,9 +53,12 @@ const Home = () => {
         };
     }, []);
 
-    // Fetch on changes to currentPage, debouncedSearchTerm, selectedCategory
+    // Fetch on changes to currentPage, debouncedSearchTerm, selectedCategory.
+    // fetchRecipes reads the latest state directly, so it is intentionally not a
+    // dependency (it is recreated every render).
     useEffect(() => {
         fetchRecipes();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentPage, debouncedSearchTerm, selectedCategory]);
 
     // Scroll handling for content updates
@@ -61,6 +68,15 @@ const Home = () => {
             shouldScroll.current = false; // Reset after scrolling
         }
     }, [currentPage, debouncedSearchTerm, selectedCategory]);
+
+    // If the current page falls past the end (e.g. the result set shrank), snap
+    // back to the last valid page instead of showing an empty grid.
+    useEffect(() => {
+        const pages = Math.ceil(totalCount / ITEMS_PER_PAGE);
+        if (pages > 0 && currentPage > pages) {
+            setCurrentPage(pages);
+        }
+    }, [totalCount, currentPage]);
 
     const scrollToRecipes = () => {
         if (recipesSectionRef.current) {
@@ -83,11 +99,12 @@ const Home = () => {
     };
 
     const fetchRecipes = async () => {
+        const requestId = ++latestRequest.current;
         try {
             setLoading(true);
             let query = supabase
                 .from('rb_recipes')
-                .select('*, rb_profiles(username)', { count: 'exact' })
+                .select(`${RECIPE_CARD_COLUMNS}, rb_profiles(username)`, { count: 'exact' })
                 .eq('is_private', false)
                 .order('created_at', { ascending: false });
 
@@ -111,12 +128,14 @@ const Home = () => {
             const { data, count, error } = await query;
 
             if (error) throw error;
-            setRecipes(data || []);
+            // Ignore stale responses from a superseded request.
+            if (requestId !== latestRequest.current) return;
+            setRecipes((data ?? []) as unknown as Recipe[]);
             setTotalCount(count || 0);
         } catch (error) {
             console.error('Error fetching recipes:', error);
         } finally {
-            setLoading(false);
+            if (requestId === latestRequest.current) setLoading(false);
         }
     };
 
@@ -151,7 +170,6 @@ const Home = () => {
                     backgroundImage: 'url("https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?auto=format&fit=crop&q=80&w=1920")',
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
-                    transform: `translateY(${window.scrollY * 0.5}px)`,
                 }}>
                     <div style={{
                         position: 'absolute',
@@ -214,6 +232,7 @@ const Home = () => {
                             <Search size={24} color="var(--color-primary)" />
                             <input
                                 type="text"
+                                aria-label="Search recipes"
                                 placeholder="What are you craving today?"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}

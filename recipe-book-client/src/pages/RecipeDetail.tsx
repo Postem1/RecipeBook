@@ -53,7 +53,7 @@ const RecipeDetail = () => {
             .select('recipe_id')
             .eq('recipe_id', id)
             .eq('user_id', user.id)
-            .single();
+            .maybeSingle();
 
         setIsFavorite(!!data);
     }, [id, user]);
@@ -97,10 +97,18 @@ const RecipeDetail = () => {
         if (!user) return navigate('/login');
 
         if (isFavorite) {
-            await supabase.from('rb_favorites').delete().eq('recipe_id', id).eq('user_id', user.id);
+            const { error } = await supabase.from('rb_favorites').delete().eq('recipe_id', id).eq('user_id', user.id);
+            if (error) {
+                console.error('Error removing favorite:', error);
+                return;
+            }
             setIsFavorite(false);
         } else {
-            await supabase.from('rb_favorites').insert({ recipe_id: id, user_id: user.id });
+            const { error } = await supabase.from('rb_favorites').insert({ recipe_id: id, user_id: user.id });
+            if (error) {
+                console.error('Error adding favorite:', error);
+                return;
+            }
             setIsFavorite(true);
         }
     };
@@ -131,7 +139,7 @@ const RecipeDetail = () => {
                 .from('rb_profiles')
                 .select('id')
                 .eq('email', normalizedEmail)
-                .single();
+                .maybeSingle();
 
             if (profileError || !profiles) {
                 setShareMessage(`User with email "${normalizedEmail}" not found. Please ensure the email is correct and they are registered.`);
@@ -331,6 +339,8 @@ const RecipeDetail = () => {
                                         setPlayingVideo(false);
                                         setIsSticky(false);
                                     }}
+                                    aria-label="Close video"
+                                    title="Close video"
                                     style={{
                                         background: 'rgba(0,0,0,0.5)',
                                         color: 'white',
@@ -361,12 +371,12 @@ const RecipeDetail = () => {
                         <div className="recipe-action-header">
                             <h2 style={{ fontSize: '1.5rem', color: 'var(--color-primary)', margin: 0 }}>Instructions</h2>
                             <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                <button onClick={toggleFavorite} className="btn btn-outline" style={{ color: isFavorite ? 'red' : 'inherit' }} title={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}>
+                                <button onClick={toggleFavorite} className="btn btn-outline" style={{ color: isFavorite ? 'red' : 'inherit' }} title={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} aria-label={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}>
                                     <Heart fill={isFavorite ? 'red' : 'none'} size={20} />
                                 </button>
                                 {isOwner && (
                                     <>
-                                        <button onClick={togglePrivacy} className="btn btn-outline" title={recipe.is_private ? 'Make Public' : 'Make Private'}>
+                                        <button onClick={togglePrivacy} className="btn btn-outline" title={recipe.is_private ? 'Make Public' : 'Make Private'} aria-label={recipe.is_private ? 'Make Public' : 'Make Private'}>
                                             {recipe.is_private ? <Unlock size={20} /> : <Lock size={20} />}
                                         </button>
                                     </>
@@ -375,7 +385,7 @@ const RecipeDetail = () => {
                                 {(isOwner || isAdmin) && (
                                     <Dialog.Root>
                                         <Dialog.Trigger asChild>
-                                            <button className="btn btn-outline" title="Share Recipe">
+                                            <button className="btn btn-outline" title="Share Recipe" aria-label="Share Recipe">
                                                 <Share2 size={20} />
                                             </button>
                                         </Dialog.Trigger>
@@ -431,13 +441,14 @@ const RecipeDetail = () => {
 
                                 {canModify && (
                                     <>
-                                        <Link to={`/edit-recipe/${recipe.id}`} className="btn btn-outline"><Edit size={20} /></Link>
+                                        <Link to={`/edit-recipe/${recipe.id}`} className="btn btn-outline" title="Edit Recipe" aria-label="Edit Recipe"><Edit size={20} /></Link>
 
                                         {isAdmin && (
                                             <button
                                                 onClick={() => setShowUserSelector(true)}
                                                 className="btn btn-outline"
                                                 title="Reassign Owner (Admin)"
+                                                aria-label="Reassign Owner (Admin)"
                                                 style={{ color: '#1976D2', borderColor: '#1976D2' }}
                                             >
                                                 <UserCheck size={20} />
@@ -446,7 +457,7 @@ const RecipeDetail = () => {
 
                                         <AlertDialog.Root>
                                             <AlertDialog.Trigger asChild>
-                                                <button className="btn btn-outline" style={{ color: 'var(--color-error)' }} title="Delete Recipe">
+                                                <button className="btn btn-outline" style={{ color: 'var(--color-error)' }} title="Delete Recipe" aria-label="Delete Recipe">
                                                     <Trash2 size={20} />
                                                 </button>
                                             </AlertDialog.Trigger>
@@ -646,6 +657,7 @@ const SharedUsersList = ({ recipeId }: { recipeId: string }) => {
                                         padding: '0.25rem'
                                     }}
                                     title="Remove access"
+                                    aria-label="Remove access"
                                 >
                                     <Trash2 size={16} />
                                 </button>

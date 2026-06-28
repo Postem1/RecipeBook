@@ -1,8 +1,10 @@
 import React from 'react';
 import ReactPlayer from 'react-player';
 
-// Workaround for type issues with ReactPlayer in some environments
-// @ts-ignore
+// react-player's exported types don't cleanly cover the props we pass, so we
+// treat it as a permissive component. (Only used as the fallback renderer;
+// YouTube/Vimeo/direct files are handled by the iframe/<video> branches below.)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ReactPlayerAny = ReactPlayer as any;
 
 interface VideoPlayerProps {
@@ -17,7 +19,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ url, style, autoPlay }) => {
         if (!url) return { type: 'unknown', src: '' };
 
         // YouTube
-        const ytMatch = url.match(/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+        const ytMatch = url.match(/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
         if (ytMatch && ytMatch[1]) {
             const origin = typeof window !== 'undefined' ? window.location.origin : '';
             return {
@@ -27,7 +29,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ url, style, autoPlay }) => {
         }
 
         // Vimeo
-        const vimeoMatch = url.match(/(?:https?:\/\/)?(?:www\.)?vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)(?:$|\/|\?)/);
+        const vimeoMatch = url.match(/(?:https?:\/\/)?(?:www\.)?vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^/]*)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)(?:$|\/|\?)/);
         if (vimeoMatch && vimeoMatch[1]) {
             return { type: 'vimeo', src: `https://player.vimeo.com/video/${vimeoMatch[1]}?autoplay=${autoPlay ? 1 : 0}` };
         }

@@ -34,6 +34,7 @@ const AdminDashboard = () => {
     const [recipes, setRecipes] = useState<Recipe[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+    const [recipeSearchTerm, setRecipeSearchTerm] = useState('');
 
     // Reassignment State
     const [assignRecipeId, setAssignRecipeId] = useState<string | null>(null);
@@ -180,7 +181,7 @@ const AdminDashboard = () => {
 
     // Filter Logic
     const filteredUsers = profiles.filter(p => p.email?.toLowerCase().includes(searchTerm.toLowerCase()));
-    const filteredRecipes = recipes.filter(r => r.title.toLowerCase().includes(searchTerm.toLowerCase()));
+    const filteredRecipes = recipes.filter(r => r.title.toLowerCase().includes(recipeSearchTerm.toLowerCase()));
 
     if (authLoading || loading) return (
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh' }}>
@@ -486,8 +487,8 @@ const AdminDashboard = () => {
                             <input
                                 type="text"
                                 placeholder="Search recipes..."
-                                value={searchTerm}
-                                onChange={e => setSearchTerm(e.target.value)}
+                                value={recipeSearchTerm}
+                                onChange={e => setRecipeSearchTerm(e.target.value)}
                                 style={{ border: 'none', background: 'transparent', outline: 'none' }}
                             />
                         </div>

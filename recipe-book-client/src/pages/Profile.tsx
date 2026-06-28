@@ -89,7 +89,7 @@ const Profile = () => {
                 .select('id')
                 .ilike('username', username)
                 .neq('id', user.id) // Exclude current user
-                .single();
+                .maybeSingle();
 
             if (existing) {
                 throw new Error('Username is already taken.');

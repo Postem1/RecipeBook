@@ -39,6 +39,8 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
                     <img
                         src={recipe.photo_url}
                         alt={recipe.title}
+                        loading="lazy"
+                        decoding="async"
                         style={{
                             position: 'absolute',
                             top: 0,
