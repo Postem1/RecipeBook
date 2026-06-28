@@ -1,9 +1,10 @@
-import { useState, useCallback, useRef, useLayoutEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useLayoutEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import RecipeCard, { type Recipe } from '../components/recipes/RecipeCard';
 import { useAuth } from '../context/AuthContext';
 import { Share2 } from 'lucide-react';
 import Pagination from '../components/common/Pagination';
+import { ITEMS_PER_PAGE, RECIPE_CARD_COLUMNS } from '../lib/constants';
 
 const SharedWithMe = () => {
     const { user } = useAuth();
@@ -12,12 +13,13 @@ const SharedWithMe = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalCount, setTotalCount] = useState(0);
 
-    const ITEMS_PER_PAGE = 10;
     const recipesSectionRef = useRef<HTMLDivElement>(null);
     const shouldScroll = useRef(false);
+    const latestRequest = useRef(0);
 
     const fetchSharedRecipes = useCallback(async () => {
         if (!user) return;
+        const requestId = ++latestRequest.current;
         try {
             setLoading(true);
             const from = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -28,13 +30,14 @@ const SharedWithMe = () => {
                 .from('rb_recipe_shares')
                 .select(`
                     recipe_id,
-                    recipe:rb_recipes (*)
+                    recipe:rb_recipes (${RECIPE_CARD_COLUMNS})
                 `, { count: 'exact' })
                 .eq('user_id', user.id)
                 .order('created_at', { ascending: false })
                 .range(from, to);
 
             if (error) throw error;
+            if (requestId !== latestRequest.current) return;
 
             // Transform data to extract the recipe object
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -44,7 +47,7 @@ const SharedWithMe = () => {
         } catch (error) {
             console.error('Error fetching shared recipes:', error);
         } finally {
-            setLoading(false);
+            if (requestId === latestRequest.current) setLoading(false);
         }
     }, [user, currentPage]);
 
@@ -75,6 +78,14 @@ const SharedWithMe = () => {
             shouldScroll.current = false;
         }
     }, [currentPage]);
+
+    // Snap back to the last valid page if the current page is now out of range.
+    useEffect(() => {
+        const pages = Math.ceil(totalCount / ITEMS_PER_PAGE);
+        if (pages > 0 && currentPage > pages) {
+            setCurrentPage(pages);
+        }
+    }, [totalCount, currentPage]);
 
     const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 

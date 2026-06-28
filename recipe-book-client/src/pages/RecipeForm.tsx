@@ -3,7 +3,11 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { Plus, X, Upload, Save, Loader, Video as VideoIcon } from 'lucide-react'; // Added VideoIcon
+import { CATEGORIES } from '../lib/constants';
 
+// An uploaded video lives in Supabase Storage; anything else (YouTube, Vimeo, a
+// direct link, ...) is treated as an external URL rather than an upload.
+const isUploadedVideo = (url?: string | null) => !!url && url.includes('/storage/v1/object/');
 
 const RecipeForm = () => {
     const { id } = useParams<{ id: string }>();
@@ -30,7 +34,7 @@ const RecipeForm = () => {
 
 
 
-    const categories = ['Breakfast', 'Lunch', 'Dinner', 'Dessert', 'Snacks'];
+    const categories = CATEGORIES;
 
     const fetchRecipe = useCallback(async () => {
         if (!id) return;
@@ -53,11 +57,7 @@ const RecipeForm = () => {
                 setCategory(data.category || 'Dinner');
                 setPhotoUrl(data.photo_url);
                 setVideoUrl(data.video_url || null);
-                if (data.video_url && !data.video_url.includes('youtube.com') && !data.video_url.includes('youtu.be')) {
-                    setVideoInputType('upload');
-                } else {
-                    setVideoInputType('url');
-                }
+                setVideoInputType(isUploadedVideo(data.video_url) ? 'upload' : 'url');
                 setIsPrivate(data.is_private || false);
             }
         } catch (error) {
@@ -139,9 +139,9 @@ const RecipeForm = () => {
                 .getPublicUrl(filePath);
 
             setVideoUrl(data.publicUrl);
-        } catch (error: any) {
+        } catch (error) {
             console.error('Error uploading video:', error);
-            setError(error.message || 'An error occurred while uploading video.');
+            setError(error instanceof Error ? error.message : 'An error occurred while uploading video.');
         } finally {
             setUploadingVideo(false);
         }
@@ -277,7 +277,7 @@ const RecipeForm = () => {
                         <input
                             type="number"
                             value={prepTime}
-                            onChange={(e) => setPrepTime(Number(e.target.value))}
+                            onChange={(e) => setPrepTime(e.target.value === '' ? '' : Number(e.target.value))}
                             style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)' }}
                         />
                     </div>
@@ -287,7 +287,7 @@ const RecipeForm = () => {
                         <input
                             type="number"
                             value={cookTime}
-                            onChange={(e) => setCookTime(Number(e.target.value))}
+                            onChange={(e) => setCookTime(e.target.value === '' ? '' : Number(e.target.value))}
                             style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)' }}
                         />
                     </div>
@@ -297,7 +297,7 @@ const RecipeForm = () => {
                         <input
                             type="number"
                             value={servings}
-                            onChange={(e) => setServings(Number(e.target.value))}
+                            onChange={(e) => setServings(e.target.value === '' ? '' : Number(e.target.value))}
                             style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)' }}
                         />
                     </div>
@@ -375,10 +375,10 @@ const RecipeForm = () => {
                                     display: 'block'
                                 }}
                             >
-                                {videoUrl && !videoUrl.includes('youtube.com') && !videoUrl.includes('youtu.be') ? (
+                                {isUploadedVideo(videoUrl) ? (
                                     <div style={{ position: 'relative' }} onClick={(e) => e.preventDefault()}>
                                         <p style={{ marginBottom: '1rem', fontWeight: 'bold' }}>Video Uploaded</p>
-                                        <video src={videoUrl} controls style={{ maxWidth: '100%', maxHeight: '200px', borderRadius: 'var(--radius-md)' }} />
+                                        <video src={videoUrl ?? undefined} controls style={{ maxWidth: '100%', maxHeight: '200px', borderRadius: 'var(--radius-md)' }} />
                                         <button
                                             type="button"
                                             onClick={() => setVideoUrl(null)}

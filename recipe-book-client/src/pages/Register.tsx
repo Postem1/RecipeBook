@@ -12,7 +12,6 @@ const Register = () => {
 
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('Registering with:', { email, password });
         setLoading(true);
         setError(null);
 
@@ -24,12 +23,18 @@ const Register = () => {
             return;
         }
 
+        if (password.length < 6) {
+            setError('Password must be at least 6 characters.');
+            setLoading(false);
+            return;
+        }
+
         // Check username uniqueness
         const { data: existingUser } = await supabase
             .from('rb_profiles')
             .select('username')
             .ilike('username', username)
-            .single();
+            .maybeSingle();
 
         if (existingUser) {
             setError('Username already taken.');

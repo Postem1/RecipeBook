@@ -1,8 +1,9 @@
-import { useState, useCallback, useRef, useLayoutEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useLayoutEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import RecipeCard, { type Recipe } from '../components/recipes/RecipeCard';
 import Pagination from '../components/common/Pagination';
+import { ITEMS_PER_PAGE, RECIPE_CARD_COLUMNS } from '../lib/constants';
 
 const Favorites = () => {
     const { user } = useAuth();
@@ -11,12 +12,13 @@ const Favorites = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalCount, setTotalCount] = useState(0);
 
-    const ITEMS_PER_PAGE = 10;
     const recipesSectionRef = useRef<HTMLDivElement>(null);
     const shouldScroll = useRef(false);
+    const latestRequest = useRef(0);
 
     const fetchFavorites = useCallback(async () => {
         if (!user) return;
+        const requestId = ++latestRequest.current;
         try {
             setLoading(true);
             const from = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -28,7 +30,7 @@ const Favorites = () => {
                 .select(`
           recipe_id,
           rb_recipes (
-            *,
+            ${RECIPE_CARD_COLUMNS},
             rb_profiles (username)
           )
         `, { count: 'exact' })
@@ -36,6 +38,7 @@ const Favorites = () => {
                 .range(from, to);
 
             if (error) throw error;
+            if (requestId !== latestRequest.current) return;
 
             // Extract recipes from the join
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -45,7 +48,7 @@ const Favorites = () => {
         } catch (error) {
             console.error('Error fetching favorites:', error);
         } finally {
-            setLoading(false);
+            if (requestId === latestRequest.current) setLoading(false);
         }
     }, [user, currentPage]);
 
@@ -79,6 +82,14 @@ const Favorites = () => {
             shouldScroll.current = false;
         }
     }, [currentPage]);
+
+    // Snap back to the last valid page if the current page is now out of range.
+    useEffect(() => {
+        const pages = Math.ceil(totalCount / ITEMS_PER_PAGE);
+        if (pages > 0 && currentPage > pages) {
+            setCurrentPage(pages);
+        }
+    }, [totalCount, currentPage]);
 
     const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 

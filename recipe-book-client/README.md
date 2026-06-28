@@ -29,7 +29,7 @@ RecipeBook is a modern, full-stack application for managing and sharing recipes.
 ## Tech Stack
 
 *   **Frontend**: React (Vite), TypeScript
-*   **Backend**: Supabase (PostgreSQL, Auth, Storage, Edge Functions)
+*   **Backend**: Supabase (PostgreSQL, Auth, Storage)
 *   **Styling**: Custom CSS variables, "Solar Flare" Design System
 *   **Deploy**: Vercel
 
