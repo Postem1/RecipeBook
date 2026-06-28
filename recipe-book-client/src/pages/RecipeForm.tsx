@@ -91,13 +91,15 @@ const RecipeForm = () => {
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!e.target.files || e.target.files.length === 0) return;
+        if (!user) return;
 
         try {
             setLoading(true);
             const file = e.target.files[0];
             const fileExt = file.name.split('.').pop();
             const fileName = `${Math.random()}.${fileExt}`;
-            const filePath = `${fileName}`;
+            // Per-user folder, enforced by storage RLS (first path segment = uid).
+            const filePath = `${user.id}/${fileName}`;
 
             const { error: uploadError } = await supabase.storage
                 .from('recipe-photos')
@@ -120,13 +122,15 @@ const RecipeForm = () => {
 
     const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!e.target.files || e.target.files.length === 0) return;
+        if (!user) return;
 
         try {
             setUploadingVideo(true);
             const file = e.target.files[0];
             const fileExt = file.name.split('.').pop();
             const fileName = `${Math.random()}.${fileExt}`;
-            const filePath = `${fileName}`;
+            // Per-user folder, enforced by storage RLS (first path segment = uid).
+            const filePath = `${user.id}/${fileName}`;
 
             const { error: uploadError } = await supabase.storage
                 .from('recipe-videos')
