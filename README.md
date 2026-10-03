@@ -11,7 +11,7 @@ A social recipe app: browse public recipes, keep your own (public or private), s
 
 - **Accounts**: sign up with email, password and username; change your username and upload an avatar on the Profile page.
 - **Recipes**: title, description, category, prep/cook time, servings, ingredient list, instructions, a photo, and a video (upload a file or paste a YouTube/Vimeo link). Each recipe is public or private.
-- **Discover**: home feed of public recipes with search (title and description), category filters (All, Breakfast, Lunch, Dinner), and 10 recipes per page.
+- **Discover**: home feed of public recipes with search (title and description), category filters, and 10 recipes per page.
 - **Social**: favorites, comments, and sharing private recipes with other users by email (they appear on the recipient's *Shared with Me* page).
 - **Admin dashboard** (admins only): recipe and user counts; promote/demote users; delete users; edit, reassign or delete any recipe.
 - **Maintenance jobs**: a daily keep-alive so the free-tier database doesn't pause, and a daily sweep that deletes uploaded files no recipe or profile uses any more (when `STORAGE_SWEEP_DELETE=true`).
