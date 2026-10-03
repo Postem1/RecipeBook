@@ -20,8 +20,8 @@
 --
 -- (recipe-images is intentionally left as-is: the client never uploads there.)
 --
--- STATUS: not yet applied. Apply via the Supabase SQL editor or `supabase db push`
--- once the client change is live in production.
+-- STATUS: applied to the live project (cmmqyxqydpqqynmxriuq) on 2026-06-28,
+-- after the per-user-folder client change was deployed to production.
 -- ============================================================================
 
 -- 1. Size + MIME limits (bytes): images 5 MB, avatars 2 MB, videos 50 MB.

@@ -19,7 +19,7 @@
 -- Idempotent (DROP ... IF EXISTS). Scope: listing only -- this does not change
 -- bucket privacy (see review item #2 for signed-URL privacy).
 --
--- STATUS: not yet applied. Apply via the Supabase SQL editor or `supabase db push`.
+-- STATUS: applied to the live project (cmmqyxqydpqqynmxriuq) on 2026-06-28.
 -- ============================================================================
 
 DROP POLICY IF EXISTS "Public Videos" ON storage.objects;
