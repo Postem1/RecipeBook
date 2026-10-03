@@ -52,7 +52,7 @@ const to = from + ITEMS_PER_PAGE - 1;
 query.range(from, to);
 ```
 
-Home search is debounced and matches `title` or `description` (`ilike`). The category filter is an `eq('category', …)`. Changing either resets to page 1. Home shows only the first four category buttons (`categories.slice(0, 4)`: All, Breakfast, Lunch, Dinner), so *Dessert* and *Snacks* recipes appear only under *All*.
+Home search is debounced and matches `title` or `description` (`ilike`). The category filter is an `eq('category', …)`. Changing either resets to page 1. The category buttons are *All* plus every entry in `CATEGORIES`.
 
 Scrolling uses an explicit opt-in so the page doesn't jump on load:
 

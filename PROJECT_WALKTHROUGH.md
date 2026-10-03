@@ -27,7 +27,7 @@ On a phone, these links sit behind the menu button. Some names are longer there:
 The home page shows public recipes, 10 per page.
 
 - **Search:** type in *"What are you craving today?"*. It matches recipe titles and descriptions.
-- **Categories:** *All*, *Breakfast*, *Lunch*, *Dinner*. Dessert and Snacks recipes appear under *All*.
+- **Categories:** *All*, *Breakfast*, *Lunch*, *Dinner*, *Dessert*, *Snacks*.
 - Click a card to open the recipe: ingredients, instructions, total time (prep + cook), servings, author, and comments. If the recipe has a video, click the play button on the photo to watch it.
 
 ## Creating and editing recipes

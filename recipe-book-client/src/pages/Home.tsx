@@ -250,14 +250,14 @@ const Home = () => {
                         </div>
                     </div>
 
-                    {/* Quick Category Pills */}
+                    {/* Category Pills */}
                     <div style={{
                         display: 'flex',
                         justifyContent: 'center',
                         gap: '0.75rem',
                         flexWrap: 'wrap'
                     }}>
-                        {categories.slice(0, 4).map((cat, i) => (
+                        {categories.map((cat, i) => (
                             <button
                                 key={cat}
                                 onClick={() => handleCategoryChange(cat)}
