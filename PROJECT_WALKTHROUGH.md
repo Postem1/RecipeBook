@@ -1,86 +1,92 @@
-# Recipe Book Application Walkthrough
+# Recipe Book: User Guide
 
-Welcome to the Recipe Book! This guide will walk you through the key features and workflows of the application.
+How to use the app. Live at https://recipe-book-theta.vercel.app (or http://localhost:5173 when running `npm run dev`; see [README.md](README.md)).
 
-## Getting Started
+## Navigation
 
-1.  **Launch the App**: Ensure the development server is running (`npm run dev`) and navigate to `http://localhost:5173`.
-2.  **Navigation**: The top navigation bar is your hub.
-    -   **RecipeBook**: Returns to the home feed.
-    -   **Discover**: Explore public recipes.
-    -   **Login / Sign Up**: Access your account.
+The top bar:
 
-## Authentication
+- **RecipeBook.** (logo) and **Discover**: the home feed.
+- Signed out: **Login** and **Sign Up**.
+- Signed in: **My Recipes**, **Shared**, **Favorites**, and your avatar (opens **Profile**). Admins also see **Admin**.
 
-To use social features and manage recipes, you must be logged in.
+On a phone, these links sit behind the menu button. Some names are longer there: *Shared With Me*, *Admin Dashboard*, *My Profile*.
 
--   **Sign Up**: Click "Sign Up", enter your email and a password. You will be automatically logged in upon success.
--   **Login**: Use your registered credentials to access your profile.
+## Accounts
 
-## Discovering Recipes
+- **Sign Up:** enter a username (letters and numbers only, up to 18 characters, must be unique), your email, and a password. You're then taken to the home page.
+- **Login:** email and password.
+- **Profile** (click your avatar):
+  - **Avatar:** click your profile picture to upload a new one (JPEG, PNG, WebP, GIF or HEIC, up to 2 MB). It saves immediately.
+  - **Username:** **Edit** → type a **New Username** → **Save**.
+  - **Change Password:** enter it twice → **Update Password**.
+  - **Sign Out**.
 
-The **Home Page** displays a feed of recipes.
+## Discovering recipes
 
--   **Search**: Use the search bar at the top to find recipes by title or ingredients.
--   **Filters**: Click the category buttons (e.g., *Breakfast*, *Lunch*) to narrow down the list.
--   **View Details**: Click on any recipe card to view the full details, including ingredients and instructions.
--   **Mobile View**: The interface is fully responsive, with action buttons automatically stacking for better accessibility on smaller screens.
+The home page shows public recipes, 10 per page.
 
-## Managing Your Recipes
+- **Search:** type in *"What are you craving today?"*. It matches recipe titles and descriptions.
+- **Categories:** *All*, *Breakfast*, *Lunch*, *Dinner*. Dessert and Snacks recipes appear under *All*.
+- Click a card to open the recipe: ingredients, instructions, total time (prep + cook), servings, author, and comments. If the recipe has a video, click the play button on the photo to watch it.
 
-Once logged in, you can contribute to the community.
+## Creating and editing recipes
 
-### Create a Recipe
-1.  Click the **"Add Recipe"** button (usually a `+` icon or "New Recipe" link).
-2.  **Details**: Enter the Title, Description, Servings, Prep Time, and Cook Time.
-3.  **Ingredients**: Add ingredients one by one.
-4.  **Instructions**: Write satisfied step-by-step instructions.
-5.  **Video**: Upload a video tutorial (MP4/WebM) to help others follow along.
-6.  **Privacy**: Toggle "Private" if you only want to share this recipe with specific people.
+1. Go to **My Recipes** → **New Recipe** (or **Create Your First Recipe** if you have none yet).
+2. Fill in:
+   - **Recipe Title**, **Description**, **Category**
+   - **Prep Time (mins)**, **Cook Time (mins)**, **Servings**
+   - **Photo:** *Click to upload a photo* (JPEG, PNG, WebP, GIF or HEIC, up to 5 MB)
+   - **Video:** either **Video URL (YouTube)**, which takes a YouTube or Vimeo link, or **Upload Video** (MP4, WebM, Ogg or QuickTime, up to 50 MB)
+   - **Ingredients:** one per line. Use **Add Ingredient** for more lines and the ✕ to remove one.
+   - **Instructions**
+   - **Visibility:** tick **Make Private** to hide the recipe from everyone except you (and people you share it with).
+3. Click **Save Recipe**. A title, instructions, and at least one ingredient are required.
 
-### Edit or Delete
--   Navigate to a recipe you created.
--   **Edit**: Click the pencil icon to modify details.
--   **Delete**: Click the trash can icon to remove the recipe permanently.
+On a recipe you own, the buttons under the photo let you:
 
-## Social Features
+| Button | Does |
+|---|---|
+| Heart | Add to / remove from Favorites (shown to everyone; signed-out visitors are sent to Login) |
+| Lock | **Make Private** / **Make Public** |
+| Share | Share the recipe with other users (see below) |
+| Edit | Open the edit form |
+| Trash | **Delete Recipe?** → **Yes, Delete** (permanent) |
 
-Connect with other food enthusiasts!
+## Sharing a private recipe
 
-### Sharing Recipes
-You can share your private recipes with friends who are also on the platform.
-1.  Open your recipe.
-2.  Click the **Share** button.
-3.  Enter the recipient's **Email Address**.
-    -   *Note*: The email search is case-insensitive (e.g., `User@Example.com` works even if they registered as `user@example.com`).
-4.  If the user exists, the recipe will appear in their **"Shared With Me"** section.
-5.  **Manage Access**: The owner can see a list of users the recipe is shared with in the Share dialog and click the **Trash** icon to revoke access.
+1. Open your recipe and click **Share**.
+2. Enter the other person's **User Email** and click **Share**. Capitalization doesn't matter, but they must already have an account.
+3. The recipe appears on their **Shared** (*Shared with Me*) page.
+4. To stop sharing, open **Share** again, click the trash icon next to their name, then confirm with **Yes, Revoke**.
 
-### Comments
--   Scroll to the bottom of any recipe.
--   Type your comment and hit **Post**.
--   Engage in discussions with the recipe creator and other users.
+> Known issue: right now, private recipes shared with non-admin users don't appear for them because of a database rule bug. A fix is tracked; see *Access rules* in [PROJECT_DOCUMENTATION.md](PROJECT_DOCUMENTATION.md).
 
-### Favorites
--   Click the **Heart** icon on any recipe to save it to your Favorites list for quick access later.
+## Comments
 
-    -   Click the **Heart** icon on any recipe to save it to your Favorites list for quick access later.
-    
-## Admin Capabilities (Superuser)
+At the bottom of a recipe: type in *Add a comment...* → **Post Comment**. You must be logged in.
 
-If you have been granted `admin` privileges, you will see an **Admin** link in the navigation bar.
+You can delete your own comments. A recipe's owner can delete any comment on it, and admins can delete any comment.
 
-### User Management
-1.  Navigate to the **Admin Dashboard**.
-2.  Switch to the **Users** tab.
-3.  **Promote/Demote**: Use the Shield icon buttons to toggle a user's role between `user` and `admin`. A confirmation dialog will appear to prevent accidental changes.
+## Favorites
 
-### Recipe Oversight
-1.  Navigate to the **Admin Dashboard** (Overview tab).
-2.  **Reassign Ownership**: In the "Recent Recipes" table, click the **User Check** icon next to a recipe.
-3.  Select a new owner from the dropdown list to transfer the recipe (useful for organizing imported recipes).
+Click the heart on a recipe. Your saved recipes are listed under **Favorites** (*My Favorites*).
+
+## Admin dashboard (admins only)
+
+Click **Admin** to open the **Superuser Dashboard**:
+
+- **Overview:** Total Users, Total Recipes, Private Recipes.
+- **Users:** search by email.
+  - **Promote to Admin** / **Demote to User** (shield icon, asks for confirmation).
+  - Delete a user. This also deletes their recipes, comments, favorites and shares. Their login itself must be removed in the Supabase dashboard.
+- **Recipes:** every recipe, public and private. You can **Edit**, **Make Public/Private**, **Reassign Owner** (pick a new owner from the list), or delete.
+
+On a recipe page, admins also get the Edit, Share and Delete buttons, plus **Reassign Owner (Admin)**.
 
 ## Troubleshooting
 
--   **Search not working?** Ensure you are spelling user emails correctly (though capitalization doesn't matter).
--   **Images not loading?** Check your internet connection as images are hosted externally.
+- **No recipes load and you can't log in:** the free-tier database may have paused. The project owner can restore it from the Supabase dashboard. A daily keep-alive job normally prevents this.
+- **Upload fails:** check the file type and size limits above.
+- **"User with email … not found" when sharing:** the recipient needs to sign up first.
+- **A recipe photo doesn't show:** photos linked from other websites can disappear or block embedding. Upload the photo instead.

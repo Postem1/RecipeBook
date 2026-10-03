@@ -1,69 +1,16 @@
-# RecipeBook - Social Recipe Manager
+# recipe-book-client
 
-RecipeBook is a modern, full-stack application for managing and sharing recipes. Built with React, Supabase, and a "Solar Flare" design system, it offers a fast, responsive, and visually engaging experience for food lovers.
+The Recipe Book web app (React 19 + TypeScript + Vite, Supabase backend), plus the Vercel functions in `api/`. This folder is the Vercel project root.
 
-## Features
+```bash
+npm install
+npm run dev      # http://localhost:5173 (needs .env with VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY)
+npm run lint
+npm run build    # tsc -b && vite build
+```
 
-### 🍳 Recipe Management
-*   **Create & Edit**: Rich text editing for ingredients and steps.
-*   **Validation**: Mandatory fields (Title, Instructions, Ingredients) ensure high-quality data.
-*   **Private vs Public**: Keep secret family recipes private or share them with the world.
-*   **Images**: Upload beautiful food photography (Supabase Storage).
-*   **Filtering**: Filter by meal type (Breakfast, Lunch, Dinner, Snack) or search by keyword.
+Full documentation lives at the repo root:
 
-### 🤝 Social & Sharing
-*   **Share Recipes**: Share private recipes with specific users via email.
-*   **Favorites**: Save recipes you love for quick access.
-*   **Community**: Public recipes appear in the global "Discover" feed.
-
-### 🛡️ Admin Dashboard (Superusers)
-*   **User Management**: View, promote, or delete users.
-*   **Recipe Oversight**: Monitor all public/private recipes.
-*   **Stats**: Quick view of total users and recipes.
-*   **Mobile Optimized**: Fully responsive card-based layout for mobile admin tasks.
-
-### ✨ UX Enhancements
-*   **Smart Pagination**: Server-side pagination (10 items/page) for fast loading on Home, My Recipes, Shared, and Favorites.
-*   **Contextual Scrolling**: Intelligent scroll management ensures you start at the top on load, but maintain context (scroll to list top) when navigating pages.
-
-## Tech Stack
-
-*   **Frontend**: React (Vite), TypeScript
-*   **Backend**: Supabase (PostgreSQL, Auth, Storage)
-*   **Styling**: Custom CSS variables, "Solar Flare" Design System
-*   **Deploy**: Vercel
-
-## Design System: "Solar Flare"
-
-The UI has been overhauled to follow the "Solar Flare" aesthetic:
-
-*   **Palette**: Warm, organic tones (Coral Red, Amber Orange) against clean white backgrounds.
-*   **Typography**: Modern sans-serif with optimized line heights and readability.
-*   **Interactions**:
-    *   **Buttons**: Gradient backgrounds with subtle hover lifts (`translateY`).
-    *   **Inputs**: Global accessible input styling with focus rings.
-    *   **Navbar**: Dynamic "glassmorphism" effect that responds to scroll position.
-
-## Getting Started
-
-1.  **Install Dependencies**:
-    ```bash
-    npm install
-    ```
-
-2.  **Environment Setup**:
-    Create a `.env` file with your Supabase credentials:
-    ```env
-    VITE_SUPABASE_URL=your_project_url
-    VITE_SUPABASE_ANON_KEY=your_anon_key
-    ```
-
-3.  **Run Locally**:
-    ```bash
-    npm run dev
-    ```
-
-4.  **Build**:
-    ```bash
-    npm run build
-    ```
+- [README.md](../README.md): features, setup, deployment, environment variables, cron jobs, migrations
+- [PROJECT_DOCUMENTATION.md](../PROJECT_DOCUMENTATION.md): technical reference
+- [PROJECT_WALKTHROUGH.md](../PROJECT_WALKTHROUGH.md): user guide
