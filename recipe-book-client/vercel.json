@@ -3,6 +3,10 @@
     {
       "path": "/api/keepalive",
       "schedule": "0 12 * * *"
+    },
+    {
+      "path": "/api/storage-sweep",
+      "schedule": "0 13 * * *"
     }
   ],
   "rewrites": [
